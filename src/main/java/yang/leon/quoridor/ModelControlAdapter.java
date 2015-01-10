@@ -8,11 +8,15 @@ public interface ModelControlAdapter {
     
     public boolean isCanPutWall(Location loc, int direction);
     
-    public void movePawn(Player p, Location newLoc);
+    public boolean movePawn(Location newLoc);
     
-    public void putWall(Player p, Location loc, int direction);
+    public void putWall(Location loc, int direction);
     
     public Player getPlayer(int playerIndex);
     
     public int getNumPlayers();
+    
+    public int getCurrPlayerIndex();
+    
+    public void nextPlayer(QuoridorView context);
 }

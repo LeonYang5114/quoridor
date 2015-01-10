@@ -2,7 +2,11 @@ package yang.leon.quoridor;
 
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Point;
 import java.util.ArrayList;
+
+import yang.leon.quoridor.state.ViewState;
 
 public class QuoridorControl {
     private QuoridorModel model;
@@ -12,15 +16,30 @@ public class QuoridorControl {
 	model = new QuoridorModel(numPlayers, new ViewControlAdapter() {
 
 	    @Override
-	    public Component getComponent() {
-		return view;
+	    public void setViewState(ViewState aState) {
+		view.setViewState(aState);
+	    }
+
+	    @Override
+	    public ViewState getViewState() {
+		return view.getViewState();
+	    }
+
+	    @Override
+	    public Image getImage(String key) {
+		return view.getImage(key);
+	    }
+
+	    @Override
+	    public void drawWall(Graphics g, Point p, int direction, String arg) {
+		view.drawWall(g, p, direction, arg);
 	    }
 
 	}, new ViewUpdateAdapter() {
 
 	    @Override
 	    public void update() {
-		view.repaint();
+		view.update();
 	    }
 
 	});
@@ -38,13 +57,13 @@ public class QuoridorControl {
 	    }
 
 	    @Override
-	    public void movePawn(Player p, Location newLoc) {
-		model.movePawn(p, newLoc);
+	    public boolean movePawn(Location newLoc) {
+		return model.movePawn(newLoc);
 	    }
 
 	    @Override
-	    public void putWall(Player p, Location loc, int direction) {
-		model.putWall(p, loc, direction);
+	    public void putWall(Location loc, int direction) {
+		model.putWall(loc, direction);
 
 	    }
 
@@ -56,6 +75,16 @@ public class QuoridorControl {
 	    @Override
 	    public int getNumPlayers() {
 		return model.getNumPlayers();
+	    }
+
+	    @Override
+	    public void nextPlayer(QuoridorView context) {
+		model.nextPlayer(context);
+	    }
+
+	    @Override
+	    public int getCurrPlayerIndex() {
+		return model.getCurrPlayerIndex();
 	    }
 
 	}, new ModelUpdateAdapter() {
@@ -77,6 +106,12 @@ public class QuoridorControl {
     }
 
     public static void main(String[] args) {
-	new QuoridorControl(2);
+	int numPlayers = 2;
+	if (args.length > 1)
+	    try {
+		numPlayers = Integer.parseInt(args[1]);
+	    } catch (NumberFormatException ext) {
+	    }
+	new QuoridorControl(numPlayers);
     }
 }

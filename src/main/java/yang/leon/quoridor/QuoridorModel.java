@@ -1,8 +1,11 @@
 package yang.leon.quoridor;
 
 import java.awt.Graphics;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import yang.leon.quoridor.state.InitState;
 
 public class QuoridorModel {
 
@@ -23,6 +26,8 @@ public class QuoridorModel {
     private Player[] players;
     public static final int TOTAL_WALLS = 20;
 
+    private int currPlayerIndex;
+
     public QuoridorModel(int numPlayers, ViewControlAdapter viewCtrlAdpt,
 	    ViewUpdateAdapter viewUpdateAdapter) {
 	this.viewCtrlAdpt = viewCtrlAdpt;
@@ -37,10 +42,14 @@ public class QuoridorModel {
 	    Location loc = players[i].getPawnLoc();
 	    squares[loc.getRow()][loc.getCol()] = true;
 	}
+
+	currPlayerIndex = 0;
     }
 
     public ArrayList<Location> getCanMoveLocs(Location loc) {
-	return getCanMoveLocs(loc, new ArrayList<Location>());
+	ArrayList<Location> visited = new ArrayList<Location>();
+	visited.add(loc);
+	return getCanMoveLocs(loc, visited);
     }
 
     private ArrayList<Location> getCanMoveLocs(Location visiting,
@@ -56,6 +65,7 @@ public class QuoridorModel {
 	    }
 	    if (squares[loc.getRow()][loc.getCol()]) {
 		itr.remove();
+		visited.add(visiting);
 		locs.addAll(getCanMoveLocs(loc, visited));
 	    }
 	}
@@ -160,27 +170,60 @@ public class QuoridorModel {
 	return false;
     }
 
-    public void movePawn(Player p, Location newLoc) {
-	Location oldLoc = p.getPawnLoc();
+    public boolean movePawn(Location newLoc) {
+	Player currPlayer = players[currPlayerIndex];
+	Location oldLoc = currPlayer.getPawnLoc();
 	squares[oldLoc.getRow()][oldLoc.getCol()] = false;
 	squares[newLoc.getRow()][newLoc.getCol()] = true;
-	p.setPawnLoc(newLoc);
+	currPlayer.setPawnLoc(newLoc);
+	return isOnEdge(currPlayer.getPawnLoc(), currPlayer.getTargetEdge());
     }
 
-    public void putWall(Player p, Location loc, int direction) {
+    public void putWall(Location loc, int direction) {
 	crossings[loc.getRow()][loc.getCol()] = direction;
-	p.setNumWalls(p.getNumWalls() - 1);
+	players[currPlayerIndex].setNumWalls(players[currPlayerIndex]
+		.getNumWalls() - 1);
     }
 
-    public Player getPlayer(int playerIndex) {
-	return players[playerIndex];
+    public Player getPlayer(int currPlayerIndex) {
+	return players[currPlayerIndex];
     }
-    
+
     public int getNumPlayers() {
 	return players.length;
     }
 
-    public void update(Graphics g) {
+    public void nextPlayer(QuoridorView context) {
+	currPlayerIndex++;
+	currPlayerIndex %= players.length;
+	viewCtrlAdpt.setViewState(new InitState(context));
+    }
 
+    public int getCurrPlayerIndex() {
+	return currPlayerIndex;
+    }
+
+    public void update(Graphics g) {
+	g.drawImage(viewCtrlAdpt.getImage("background"), 0, 0, null);
+
+	for (int r = 0; r < HEIGHT; r++) {
+	    for (int c = 0; c < WIDTH; c++) {
+		if (squares[r][c]) {
+		    Point p = QuoridorView
+			    .getPointFromSqrLoc(new Location(r, c));
+		    g.drawImage(viewCtrlAdpt.getImage("pawn"), p.x, p.y, null);
+		}
+	    }
+	}
+
+	for (int r = 0; r < HEIGHT - 1; r++) {
+	    for (int c = 0; c < WIDTH - 1; c++) {
+		if (crossings[r][c] != NO_WALL) {
+		    Point p = QuoridorView
+			    .getPointFromCrsLoc(new Location(r, c));
+		    viewCtrlAdpt.drawWall(g, p, crossings[r][c], null);
+		}
+	    }
+	}
     }
 }

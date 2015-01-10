@@ -1,5 +1,7 @@
 package yang.leon.quoridor.state;
 
+import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
@@ -11,30 +13,49 @@ import yang.leon.quoridor.QuoridorView;
 
 public class MovingPawnState extends ViewState {
 
-    public MovingPawnState(int playerIndex) {
-	super(playerIndex);
+    public MovingPawnState(QuoridorView context) {
+	super(context);
     }
 
     @Override
-    public void mouseClicked(MouseEvent e, QuoridorView context) {
+    public void mousePressed(MouseEvent e) {
+	if (SwingUtilities.isRightMouseButton(e)) {
+	    getContext().setViewState(new InitState(getContext()));
+	    return;
+	}
 	if (!SwingUtilities.isLeftMouseButton(e))
 	    return;
 	Location loc = QuoridorView.getSqrLocAtPoint(e.getPoint());
-	ModelControlAdapter adpt = context.getModelCtrlAdpt();
+	ModelControlAdapter adpt = getContext().getModelCtrlAdpt();
 	ArrayList<Location> canMoveLocs = adpt.getCanMoveLocs(adpt.getPlayer(
-		getPlayerIndex()).getPawnLoc());
+		adpt.getCurrPlayerIndex()).getPawnLoc());
 	if (!canMoveLocs.contains(loc))
 	    return;
-	adpt.movePawn(adpt.getPlayer(getPlayerIndex()), loc);
-	context.setState(new InitState((getPlayerIndex() + 1)
-		/ adpt.getNumPlayers()));
-	context.update();
+	if (adpt.movePawn(loc)) {
+	    getContext().win(adpt.getCurrPlayerIndex());
+	    return;
+	}
+	adpt.nextPlayer(getContext());
     }
 
     @Override
-    public void update(QuoridorView context) {
-	ModelControlAdapter adpt = context.getModelCtrlAdpt();
-	ArrayList<Location> canMoveLocs = adpt.getCanMoveLocs(adpt.getPlayer(
-		getPlayerIndex()).getPawnLoc());
+    public void mouseMoved(MouseEvent e) {
+    }
+
+    @Override
+    public void update(Graphics g) {
+	drawCurrPlayer(g);
+	ModelControlAdapter adpt = getContext().getModelCtrlAdpt();
+	Location pawnLoc = adpt.getPlayer(adpt.getCurrPlayerIndex())
+		.getPawnLoc();
+	ArrayList<Location> canMoveLocs = adpt.getCanMoveLocs(pawnLoc);
+	for (Location loc : canMoveLocs) {
+	    Point p = QuoridorView.getPointFromSqrLoc(loc);
+	    g.drawImage(getContext().getImage("pawn.light"), p.x, p.y, null);
+	}
+    }
+
+    public String toString() {
+	return "Moving pawn state.";
     }
 }
