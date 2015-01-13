@@ -2,16 +2,18 @@ package yang.leon.quoridor.state;
 
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
+import java.rmi.RemoteException;
 
 import javax.swing.SwingUtilities;
 
+import yang.leon.quoridor.AbstractView;
+import yang.leon.quoridor.DefaultView;
+import yang.leon.quoridor.IModelAdapter;
 import yang.leon.quoridor.Location;
-import yang.leon.quoridor.ModelControlAdapter;
-import yang.leon.quoridor.QuoridorView;
 
-public class InitState extends ViewState {
+public class InitState extends IViewState {
 
-    public InitState(QuoridorView context) {
+    public InitState(AbstractView context) {
 	super(context);
     }
 
@@ -19,10 +21,14 @@ public class InitState extends ViewState {
     public void mousePressed(MouseEvent e) {
 	if (!SwingUtilities.isLeftMouseButton(e))
 	    return;
-	Location loc = QuoridorView.getSqrLocAtPoint(e.getPoint());
-	ModelControlAdapter adpt = getContext().getModelCtrlAdpt();
-	if (adpt.getPlayer(adpt.getCurrPlayerIndex()).getPawnLoc().equals(loc))
-	    getContext().setViewState(new MovingPawnState(getContext()));
+	Location loc = DefaultView.getSqrLocAtPoint(e.getPoint());
+	IModelAdapter adpt = getContext().getModelAdapter();
+	try {
+	    if (adpt.getPlayer(adpt.getCurrPlayerIndex()).getPawnLoc().equals(loc))
+	        getContext().setViewState(new MovingPawnState(getContext()));
+	} catch (RemoteException e1) {
+	    e1.printStackTrace();
+	}
     }
 
     @Override

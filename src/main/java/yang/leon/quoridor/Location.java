@@ -25,6 +25,22 @@ public class Location {
 	this.col = col;
     }
 
+    public Location toRotatedLoc(int playerIndex) {
+	int index = playerIndex % 4;
+	switch (index) {
+	case 0:
+	    return new Location(getRow(), getCol());
+	case 1:
+	    return new Location(8 - getCol(), getRow());
+	case 2:
+	    return new Location(8 - getRow(), getCol());
+	case 3:
+	    return new Location(getCol(), 8 - getRow());
+	default:
+	    return null;
+	}
+    }
+
     public String toString() {
 	return "Row: " + getRow() + ", Col: " + getCol();
     }

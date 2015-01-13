@@ -3,18 +3,20 @@ package yang.leon.quoridor.state;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.rmi.RemoteException;
 
+import yang.leon.quoridor.AbstractView;
+import yang.leon.quoridor.IModelAdapter;
 import yang.leon.quoridor.Location;
-import yang.leon.quoridor.ModelControlAdapter;
 import yang.leon.quoridor.Player;
-import yang.leon.quoridor.QuoridorModel;
-import yang.leon.quoridor.QuoridorView;
+import yang.leon.quoridor.DefaultModel;
+import yang.leon.quoridor.DefaultView;
 
-public abstract class ViewState {
+public abstract class IViewState {
 
-    private QuoridorView context;
+    private AbstractView context;
 
-    public ViewState(QuoridorView context) {
+    public IViewState(AbstractView context) {
 	this.context = context;
     }
 
@@ -22,29 +24,37 @@ public abstract class ViewState {
 
     public abstract void mouseMoved(MouseEvent e);
 
-    public QuoridorView getContext() {
+    public AbstractView getContext() {
 	return context;
     }
 
     public abstract void update(Graphics g);
 
     public void drawCurrPlayer(Graphics g) {
-	ModelControlAdapter adpt = getContext().getModelCtrlAdpt();
-	Player player = adpt.getPlayer(adpt.getCurrPlayerIndex());
+	IModelAdapter adpt = getContext().getModelAdapter();
+	Player player = null;
+	try {
+	    player = adpt.getPlayer(adpt.getCurrPlayerIndex());
+	} catch (RemoteException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
+	if (player == null)
+	    return;
 	switch (player.getTargetEdge()) {
-	case QuoridorModel.NORTH_EDGE:
+	case DefaultModel.NORTH_EDGE:
 	    g.drawImage(getContext().getImage("target.edge.horizontal"), 0, 0,
 		    null);
 	    break;
-	case QuoridorModel.WEST_EDGE:
+	case DefaultModel.WEST_EDGE:
 	    g.drawImage(getContext().getImage("target.edge.vertical"), 0, 0,
 		    null);
 	    break;
-	case QuoridorModel.SOUTH_EDGE:
+	case DefaultModel.SOUTH_EDGE:
 	    g.drawImage(getContext().getImage("target.edge.horizontal"), 0,
 		    404, null);
 	    break;
-	case QuoridorModel.EAST_EDGE:
+	case DefaultModel.EAST_EDGE:
 	    g.drawImage(getContext().getImage("target.edge.vertical"), 404, 0,
 		    null);
 	    break;
@@ -52,7 +62,7 @@ public abstract class ViewState {
 	    break;
 	}
 	Location pawnLoc = player.getPawnLoc();
-	Point pawnPoint = QuoridorView.getPointFromSqrLoc(pawnLoc);
+	Point pawnPoint = DefaultView.getPointFromSqrLoc(pawnLoc);
 	g.drawImage(getContext().getImage("current.pawn"), pawnPoint.x,
 		pawnPoint.y, null);
     }

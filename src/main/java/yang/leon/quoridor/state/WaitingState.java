@@ -3,11 +3,11 @@ package yang.leon.quoridor.state;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 
-import yang.leon.quoridor.QuoridorView;
+import yang.leon.quoridor.AbstractView;
 
-public class WaitingState extends ViewState {
+public class WaitingState extends IViewState {
 
-    public WaitingState(QuoridorView context) {
+    public WaitingState(AbstractView context) {
 	super(context);
 	getContext().disableButtons();
     }

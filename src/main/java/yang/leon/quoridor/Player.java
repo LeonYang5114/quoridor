@@ -23,13 +23,13 @@ public class Player {
 	this.setNumWalls(TOTAL_WALLS / numPlayers);
 	this.setPawnLoc(INITIAL_LOCATIONS[numPlayers - 1][index]);
 	if (getPawnLoc().getRow() == 0)
-	    targetEdge = QuoridorModel.SOUTH_EDGE;
-	else if (getPawnLoc().getRow() == QuoridorModel.HEIGHT - 1)
-	    targetEdge = QuoridorModel.NORTH_EDGE;
+	    targetEdge = DefaultModel.SOUTH_EDGE;
+	else if (getPawnLoc().getRow() == DefaultModel.HEIGHT - 1)
+	    targetEdge = DefaultModel.NORTH_EDGE;
 	else if (getPawnLoc().getCol() == 0)
-	    targetEdge = QuoridorModel.EAST_EDGE;
-	else if (getPawnLoc().getCol() == QuoridorModel.WIDTH - 1)
-	    targetEdge = QuoridorModel.WEST_EDGE;
+	    targetEdge = DefaultModel.EAST_EDGE;
+	else if (getPawnLoc().getCol() == DefaultModel.WIDTH - 1)
+	    targetEdge = DefaultModel.WEST_EDGE;
     }
 
     public int getNumWalls() {

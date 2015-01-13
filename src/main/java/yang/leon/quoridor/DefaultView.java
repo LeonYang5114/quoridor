@@ -1,7 +1,6 @@
 package yang.leon.quoridor;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -13,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.rmi.RemoteException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +20,7 @@ import java.util.Properties;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -28,39 +28,36 @@ import javax.swing.SwingUtilities;
 import yang.leon.quoridor.state.HoldingWallState;
 import yang.leon.quoridor.state.InitState;
 import yang.leon.quoridor.state.MovingPawnState;
-import yang.leon.quoridor.state.ViewState;
 import yang.leon.quoridor.state.WonState;
 
-public class QuoridorView extends JFrame {
-    public static final int GRID_WIDTH = 450, GRID_HEIGHT = 450;
-
-    private ModelControlAdapter modelCtrlAdpt;
-    private ModelUpdateAdapter modelUpdateAdpt;
+public class DefaultView extends AbstractView {
 
     private JPanel pnl_grid;
-    private JPanel pnl_player;
+    private JPanel pnl_func;
 
     private JButton btn_wall;
+    private JLabel lb_numWalls;
     private JButton btn_pawn;
 
-    private ViewState viewState;
+    private transient Map<String, Image> images;
 
-    private Map<String, Image> images;
+    private boolean isResettingGUI;
 
-    public QuoridorView(ModelControlAdapter modelControlAdapter,
-	    ModelUpdateAdapter modelUpdateAdapter) {
-	modelCtrlAdpt = modelControlAdapter;
-	modelUpdateAdpt = modelUpdateAdapter;
-	images = new HashMap<String, Image>();
-	loadImages();
-	SwingUtilities.invokeLater(new Runnable() {
-	    public void run() {
-		initGUI();
-	    }
-	});
+    public DefaultView() {
+	this(null);
     }
 
-    private void loadImages() {
+    public DefaultView(IModelAdapter modelAdpt) {
+	images = new HashMap<String, Image>();
+	loadImages();
+	try {
+	    modelAdpt.registerView(this);
+	} catch (RemoteException e) {
+	    e.printStackTrace();
+	}
+    }
+
+    protected void loadImages() {
 	Properties prop = new Properties();
 	String propertiesFileName = "images/images.properties";
 	InputStream is = getClass().getClassLoader().getResourceAsStream(
@@ -91,29 +88,39 @@ public class QuoridorView extends JFrame {
 	}
     }
 
-    public void initGUI() {
+    public Image getImage(String key) {
+	return images.get(key);
+    }
+
+    public void resetGUI() {
+	if (isResettingGUI)
+	    return;
+	isResettingGUI = true;
+	this.removeAll();
 	pnl_grid = new JPanel() {
 	    public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		modelUpdateAdpt.update(g);
-		viewState.update(g);
+		try {
+		    getModelAdapter().update(g, DefaultView.this);
+		} catch (RemoteException e) {
+		    e.printStackTrace();
+		}
+		getViewState().update(g);
 	    }
 	};
-	pnl_player = new JPanel();
-
-	viewState = new InitState(this);
+	pnl_func = new JPanel();
 
 	pnl_grid.setPreferredSize(new Dimension(GRID_WIDTH, GRID_HEIGHT));
 	pnl_grid.addMouseListener(new MouseAdapter() {
-	    
+
 	    public void mousePressed(MouseEvent e) {
-		viewState.mousePressed(e);
+		getViewState().mousePressed(e);
 	    }
 	});
 	pnl_grid.addMouseMotionListener(new MouseAdapter() {
 
 	    public void mouseMoved(MouseEvent e) {
-		viewState.mouseMoved(e);
+		getViewState().mouseMoved(e);
 	    }
 	});
 
@@ -123,11 +130,13 @@ public class QuoridorView extends JFrame {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		if (viewState instanceof HoldingWallState)
+		if (getViewState() instanceof HoldingWallState)
 		    return;
-		setViewState(new HoldingWallState(QuoridorView.this));
+		setViewState(new HoldingWallState(DefaultView.this));
 	    }
 	});
+
+	lb_numWalls = new JLabel();
 
 	btn_pawn = new JButton("Pawn");
 	btn_pawn.setPreferredSize(new Dimension(90, 60));
@@ -135,9 +144,9 @@ public class QuoridorView extends JFrame {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		if (viewState instanceof MovingPawnState)
+		if (getViewState() instanceof MovingPawnState)
 		    return;
-		setViewState(new MovingPawnState(QuoridorView.this));
+		setViewState(new MovingPawnState(DefaultView.this));
 		update();
 	    }
 	});
@@ -148,97 +157,55 @@ public class QuoridorView extends JFrame {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		System.out.println(viewState);
+		System.out.println(getViewState());
 	    }
 
 	});
 
-	pnl_player.setPreferredSize(new Dimension(GRID_WIDTH, 100));
-	pnl_player.add(btn_wall);
-	pnl_player.add(btn_pawn);
-	pnl_player.add(btn_test);
+	pnl_func.setPreferredSize(new Dimension(GRID_WIDTH, 100));
+	pnl_func.add(btn_wall);
+	pnl_func.add(lb_numWalls);
+	pnl_func.add(btn_pawn);
+	pnl_func.add(btn_test);
 
-	Container contentPane = this.getContentPane();
-	contentPane.setLayout(new BorderLayout());
-	contentPane.add(pnl_grid, BorderLayout.CENTER);
-	contentPane.add(pnl_player, BorderLayout.SOUTH);
-
-	this.setTitle("Quoridor");
-	this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	this.setResizable(false);
-	this.pack();
-	this.setLocationRelativeTo(null);
-	this.setVisible(true);
-	update();
-    }
-
-    public static Location getSqrLocAtPoint(Point point) {
-	int squareHeight = GRID_HEIGHT / QuoridorModel.HEIGHT;
-	int squareWidth = GRID_WIDTH / QuoridorModel.WIDTH;
-	return new Location(point.y / squareHeight, point.x / squareWidth);
-    }
-
-    public static Point getPointFromSqrLoc(Location loc) {
-	int squareHeight = GRID_HEIGHT / QuoridorModel.HEIGHT;
-	int squareWidth = GRID_WIDTH / QuoridorModel.WIDTH;
-	return new Point(loc.getCol() * squareWidth, loc.getRow()
-		* squareHeight);
-    }
-
-    public static Location getCrsLocAtPoint(Point point) {
-	int squareHeight = GRID_HEIGHT / QuoridorModel.HEIGHT;
-	int squareWidth = GRID_WIDTH / QuoridorModel.WIDTH;
-	int row = (point.y - squareHeight / 2) / squareHeight;
-	row = Math.max(Math.min(row, 7), 0);
-	int col = (point.x - squareWidth / 2) / squareWidth;
-	col = Math.max(Math.min(col, 7), 0);
-	return new Location(row, col);
-    }
-
-    public static Point getPointFromCrsLoc(Location loc) {
-	int squareHeight = GRID_HEIGHT / QuoridorModel.HEIGHT;
-	int squareWidth = GRID_WIDTH / QuoridorModel.WIDTH;
-	return new Point((loc.getCol() + 1) * squareWidth, (loc.getRow() + 1)
-		* squareHeight);
+	setLayout(new BorderLayout());
+	add(pnl_grid, BorderLayout.CENTER);
+	add(pnl_func, BorderLayout.SOUTH);
+	setPreferredSize(getPreferredSize());
+	setViewState(new InitState(this));
+	isResettingGUI = false;
     }
 
     public JPanel getGridPanel() {
 	return pnl_grid;
     }
 
-    public ViewState getViewState() {
-	return viewState;
-    }
-
-    public void setViewState(ViewState aState) {
-	this.viewState = aState;
-	update();
-    }
-
-    public ModelControlAdapter getModelCtrlAdpt() {
-	return modelCtrlAdpt;
-    }
-
-    public ModelUpdateAdapter getModelUpdateAdp() {
-	return modelUpdateAdpt;
-    }
-
     public void update() {
+	IModelAdapter modelAdpt = getModelAdapter();
+	if (modelAdpt == null)
+	    return;
+	try {
+	    lb_numWalls.setText("X "
+		    + modelAdpt.getPlayer(modelAdpt.getCurrPlayerIndex())
+			    .getNumWalls());
+	} catch (RemoteException e) {
+	    e.printStackTrace();
+	}
 	repaint();
     }
 
-    public Image getImage(String key) {
-	return images.get(key);
+    public void drawBackground(Graphics g) {
+	g.drawImage(getImage("background"), 0, 0, null);
     }
 
     public void drawWall(Graphics g, Point p, int direction, String arg) {
 	Image wall = null;
-	if (direction == QuoridorModel.HORIZONTAL_WALL) {
+	if (direction == DefaultModel.HORIZONTAL_WALL) {
 	    if (arg != null && arg.equals("light"))
 		wall = getImage("wall.horizontal.light");
 	    else
 		wall = getImage("wall.horizontal");
-	} else if (direction == QuoridorModel.VERTICAL_WALL) {
+	} else if (direction == DefaultModel.VERTICAL_WALL) {
 	    if (arg != null && arg.equals("light"))
 		wall = getImage("wall.vertical.light");
 	    else
@@ -247,6 +214,10 @@ public class QuoridorView extends JFrame {
 	if (wall != null)
 	    g.drawImage(wall, p.x - wall.getWidth(null) / 2,
 		    p.y - wall.getHeight(null) / 2, null);
+    }
+
+    public void drawPawn(Graphics g, Point p) {
+	g.drawImage(getImage("pawn"), p.x, p.y, null);
     }
 
     public void win(int currPlayerIndex) {

@@ -5,16 +5,18 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.rmi.RemoteException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import yang.leon.quoridor.AbstractView;
+import yang.leon.quoridor.DefaultModel;
+import yang.leon.quoridor.DefaultView;
+import yang.leon.quoridor.IModelAdapter;
 import yang.leon.quoridor.Location;
-import yang.leon.quoridor.ModelControlAdapter;
-import yang.leon.quoridor.QuoridorModel;
-import yang.leon.quoridor.QuoridorView;
 
-public class HoldingWallState extends ViewState {
+public class HoldingWallState extends IViewState {
 
     private int direction;
     private Point mouseLocation;
@@ -22,9 +24,9 @@ public class HoldingWallState extends ViewState {
     private Timer timer;
     private boolean showPuttingLoc;
 
-    public HoldingWallState(QuoridorView context) {
+    public HoldingWallState(AbstractView context) {
 	super(context);
-	direction = QuoridorModel.HORIZONTAL_WALL;
+	direction = DefaultModel.HORIZONTAL_WALL;
 	timer = new Timer(DELAY, new ActionListener() {
 
 	    @Override
@@ -39,8 +41,8 @@ public class HoldingWallState extends ViewState {
     @Override
     public void mousePressed(MouseEvent e) {
 	if (SwingUtilities.isRightMouseButton(e)) {
-	    direction = (direction == QuoridorModel.HORIZONTAL_WALL) ? QuoridorModel.VERTICAL_WALL
-		    : QuoridorModel.HORIZONTAL_WALL;
+	    direction = (direction == DefaultModel.HORIZONTAL_WALL) ? DefaultModel.VERTICAL_WALL
+		    : DefaultModel.HORIZONTAL_WALL;
 	    showPuttingLoc = false;
 	    timer.restart();
 	    getContext().repaint();
@@ -48,11 +50,15 @@ public class HoldingWallState extends ViewState {
 	}
 	if (!SwingUtilities.isLeftMouseButton(e))
 	    return;
-	Location loc = QuoridorView.getCrsLocAtPoint(e.getPoint());
-	ModelControlAdapter adpt = getContext().getModelCtrlAdpt();
-	if (adpt.isCanPutWall(loc, direction)) {
-	    adpt.putWall(loc, direction);
-	    adpt.nextPlayer(getContext());
+	Location loc = DefaultView.getCrsLocAtPoint(e.getPoint());
+	IModelAdapter adpt = getContext().getModelAdapter();
+	try {
+	    if (adpt.isCanPutWall(loc, direction)) {
+	        adpt.putWall(loc, direction);
+	        adpt.nextPlayer(getContext());
+	    }
+	} catch (RemoteException e1) {
+	    e1.printStackTrace();
 	}
     }
 
@@ -69,18 +75,22 @@ public class HoldingWallState extends ViewState {
 	drawCurrPlayer(g);
 	if (mouseLocation == null)
 	    return;
-	Location loc = QuoridorView.getCrsLocAtPoint(mouseLocation);
-	if (showPuttingLoc
-		&& getContext().getModelCtrlAdpt().isCanPutWall(loc, direction)) {
-	    Point putting = QuoridorView.getPointFromCrsLoc(loc);
-	    getContext().drawWall(g, putting, direction, "light");
+	Location loc = DefaultView.getCrsLocAtPoint(mouseLocation);
+	try {
+	    if (showPuttingLoc
+	    	&& getContext().getModelAdapter().isCanPutWall(loc, direction)) {
+	        Point putting = DefaultView.getPointFromCrsLoc(loc);
+	        getContext().drawWall(g, putting, direction, "light");
+	    }
+	} catch (RemoteException e) {
+	    e.printStackTrace();
 	}
 	getContext().drawWall(g, mouseLocation, direction, null);
     }
 
     public String toString() {
 	return "Holding wall state; direction: "
-		+ ((direction == QuoridorModel.HORIZONTAL_WALL) ? "horizontal."
+		+ ((direction == DefaultModel.HORIZONTAL_WALL) ? "horizontal."
 			: "vertical.");
     }
 }

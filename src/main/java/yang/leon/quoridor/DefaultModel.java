@@ -2,36 +2,22 @@ package yang.leon.quoridor;
 
 import java.awt.Graphics;
 import java.awt.Point;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import yang.leon.quoridor.state.InitState;
 
-public class QuoridorModel {
-
-    private ViewControlAdapter viewCtrlAdpt;
-    private ViewUpdateAdapter viewUpdateAdpt;
-
-    public static final int WIDTH = 9, HEIGHT = 9;
-
-    public static final int NOT_ON_EDGE = -1, NORTH_EDGE = 0, EAST_EDGE = 1,
-	    SOUTH_EDGE = 2, WEST_EDGE = 3;
+public class DefaultModel extends AbstractModel {
 
     private boolean[][] squares;
-
-    public static final int NO_WALL = 0, HORIZONTAL_WALL = 1,
-	    VERTICAL_WALL = 2;
     private int[][] crossings;
 
     private Player[] players;
-    public static final int TOTAL_WALLS = 20;
 
     private int currPlayerIndex;
 
-    public QuoridorModel(int numPlayers, ViewControlAdapter viewCtrlAdpt,
-	    ViewUpdateAdapter viewUpdateAdapter) {
-	this.viewCtrlAdpt = viewCtrlAdpt;
-	this.viewUpdateAdpt = viewUpdateAdapter;
+    public DefaultModel(int numPlayers) {
 
 	squares = new boolean[WIDTH][HEIGHT];
 	crossings = new int[WIDTH - 1][HEIGHT - 1];
@@ -185,33 +171,38 @@ public class QuoridorModel {
 		.getNumWalls() - 1);
     }
 
-    public Player getPlayer(int currPlayerIndex) {
-	return players[currPlayerIndex];
+    public Player getPlayer(int playerIndex) {
+	return players[playerIndex];
     }
 
     public int getNumPlayers() {
 	return players.length;
     }
 
-    public void nextPlayer(QuoridorView context) {
+    public void nextPlayer(AbstractView context) {
 	currPlayerIndex++;
 	currPlayerIndex %= players.length;
-	viewCtrlAdpt.setViewState(new InitState(context));
+	context.setViewState(new InitState(context));
     }
 
     public int getCurrPlayerIndex() {
 	return currPlayerIndex;
     }
 
-    public void update(Graphics g) {
-	g.drawImage(viewCtrlAdpt.getImage("background"), 0, 0, null);
+    public void update(Graphics g, AbstractView context) {
+	paintGrid(g, context);
+	getViewAdapter().update(context);
+    }
+
+    private void paintGrid(Graphics g, AbstractView context) {
+	context.drawBackground(g);
 
 	for (int r = 0; r < HEIGHT; r++) {
 	    for (int c = 0; c < WIDTH; c++) {
 		if (squares[r][c]) {
-		    Point p = QuoridorView
+		    Point p = DefaultView
 			    .getPointFromSqrLoc(new Location(r, c));
-		    g.drawImage(viewCtrlAdpt.getImage("pawn"), p.x, p.y, null);
+		    context.drawPawn(g, p);
 		}
 	    }
 	}
@@ -219,11 +210,12 @@ public class QuoridorModel {
 	for (int r = 0; r < HEIGHT - 1; r++) {
 	    for (int c = 0; c < WIDTH - 1; c++) {
 		if (crossings[r][c] != NO_WALL) {
-		    Point p = QuoridorView
+		    Point p = DefaultView
 			    .getPointFromCrsLoc(new Location(r, c));
-		    viewCtrlAdpt.drawWall(g, p, crossings[r][c], null);
+		    context.drawWall(g, p, crossings[r][c], null);
 		}
 	    }
 	}
+
     }
 }
