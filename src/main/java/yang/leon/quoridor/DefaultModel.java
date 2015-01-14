@@ -2,14 +2,17 @@ package yang.leon.quoridor;
 
 import java.awt.Graphics;
 import java.awt.Point;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import yang.leon.quoridor.state.InitState;
+import javax.swing.SwingUtilities;
 
 public class DefaultModel extends AbstractModel {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3583850882738528510L;
     private boolean[][] squares;
     private int[][] crossings;
 
@@ -30,6 +33,8 @@ public class DefaultModel extends AbstractModel {
 	}
 
 	currPlayerIndex = 0;
+
+	setUpdateDelegate(createUpdateDelegate());
     }
 
     public ArrayList<Location> getCanMoveLocs(Location loc) {
@@ -162,6 +167,7 @@ public class DefaultModel extends AbstractModel {
 	squares[oldLoc.getRow()][oldLoc.getCol()] = false;
 	squares[newLoc.getRow()][newLoc.getCol()] = true;
 	currPlayer.setPawnLoc(newLoc);
+	setUpdateDelegate(createUpdateDelegate());
 	return isOnEdge(currPlayer.getPawnLoc(), currPlayer.getTargetEdge());
     }
 
@@ -169,6 +175,7 @@ public class DefaultModel extends AbstractModel {
 	crossings[loc.getRow()][loc.getCol()] = direction;
 	players[currPlayerIndex].setNumWalls(players[currPlayerIndex]
 		.getNumWalls() - 1);
+	setUpdateDelegate(createUpdateDelegate());
     }
 
     public Player getPlayer(int playerIndex) {
@@ -179,43 +186,76 @@ public class DefaultModel extends AbstractModel {
 	return players.length;
     }
 
-    public void nextPlayer(AbstractView context) {
+    public String nextPlayer() {
 	currPlayerIndex++;
 	currPlayerIndex %= players.length;
-	context.setViewState(new InitState(context));
+	return "InitialState";
     }
 
     public int getCurrPlayerIndex() {
 	return currPlayerIndex;
     }
 
-    public void update(Graphics g, AbstractView context) {
-	paintGrid(g, context);
-	getViewAdapter().update(context);
+    public void requestWaitForUpdate() {
+	SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+		long start = System.currentTimeMillis();
+		while (!hasDoneWithUpdate()
+			&& System.currentTimeMillis() - start < UPDATE_TIME_OUT) {
+		    try {
+			Thread.sleep(10);
+		    } catch (InterruptedException e) {
+			e.printStackTrace();
+		    }
+		    Thread.yield();
+		}
+	    }
+	});
     }
 
-    private void paintGrid(Graphics g, AbstractView context) {
-	context.drawBackground(g);
+    public void update(Graphics g, AbstractView context) {
+	getUpdateDelegate().update(g, context);
+    }
 
+    private AbstractModel createUpdateDelegate() {
+
+	final ArrayList<Point> drawPawnPoints = new ArrayList<Point>();
 	for (int r = 0; r < HEIGHT; r++) {
 	    for (int c = 0; c < WIDTH; c++) {
 		if (squares[r][c]) {
 		    Point p = DefaultView
 			    .getPointFromSqrLoc(new Location(r, c));
-		    context.drawPawn(g, p);
+		    drawPawnPoints.add(p);
 		}
 	    }
 	}
 
+	final ArrayList<Object[]> drawWallParas = new ArrayList<Object[]>();
 	for (int r = 0; r < HEIGHT - 1; r++) {
 	    for (int c = 0; c < WIDTH - 1; c++) {
 		if (crossings[r][c] != NO_WALL) {
 		    Point p = DefaultView
 			    .getPointFromCrsLoc(new Location(r, c));
-		    context.drawWall(g, p, crossings[r][c], null);
+		    drawWallParas.add(new Object[] { p, crossings[r][c] });
 		}
 	    }
 	}
+
+	return new DelegateModel() {
+	    /**
+	     * 
+	     */
+	    private static final long serialVersionUID = -8449782332509624181L;
+
+	    public void update(Graphics g, AbstractView context) {
+		context.drawBackground(g);
+		for (Point p : drawPawnPoints)
+		    context.drawPawn(g, p);
+		for (Object[] o : drawWallParas) {
+		    context.drawWall(g, (Point) o[0], (int) o[1], null);
+		}
+	    }
+	};
 
     }
 }

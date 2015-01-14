@@ -11,6 +11,11 @@ import yang.leon.quoridor.Location;
 
 public class WonState extends WaitingState {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8988859134229907152L;
+
     public WonState(AbstractView context) {
 	super(context);
     }

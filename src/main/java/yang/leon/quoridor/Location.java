@@ -1,7 +1,13 @@
 package yang.leon.quoridor;
 
-public class Location {
+import java.io.Serializable;
 
+public class Location implements Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 55019413903442916L;
     private int row, col;
 
     public Location(int row, int col) {

@@ -1,6 +1,5 @@
 package yang.leon.quoridor;
 
-import java.awt.Graphics;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -23,10 +22,19 @@ public interface IModelAdapter extends Remote {
 
     public int getNumPlayers() throws RemoteException;
 
-    public void nextPlayer(AbstractView abstractView) throws RemoteException;
+    public String nextPlayer() throws RemoteException;
 
-    public void update(Graphics g, AbstractView context) throws RemoteException;
+    public AbstractView getUpdatingView() throws RemoteException;
+
+    public AbstractModel getUpdateDelegate() throws RemoteException;
+    
+    public void requestWaitForUpdate() throws RemoteException;
 
     public int getCurrPlayerIndex() throws RemoteException;
+
+    public void doneWithUpdateNotify(AbstractView context)
+	    throws RemoteException;
+    
+    public void requestUpdate() throws RemoteException;
 
 }

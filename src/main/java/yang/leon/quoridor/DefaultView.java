@@ -26,12 +26,17 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import yang.leon.quoridor.state.HoldingWallState;
-import yang.leon.quoridor.state.InitState;
+import yang.leon.quoridor.state.IViewState;
+import yang.leon.quoridor.state.InitialState;
 import yang.leon.quoridor.state.MovingPawnState;
 import yang.leon.quoridor.state.WonState;
 
 public class DefaultView extends AbstractView {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6783231460747770839L;
     private JPanel pnl_grid;
     private JPanel pnl_func;
 
@@ -43,12 +48,13 @@ public class DefaultView extends AbstractView {
 
     private boolean isResettingGUI;
 
+    private IViewState viewState;
+
     public DefaultView() {
-	this(null);
+	loadImages();
     }
 
     public DefaultView(IModelAdapter modelAdpt) {
-	images = new HashMap<String, Image>();
 	loadImages();
 	try {
 	    modelAdpt.registerView(this);
@@ -57,7 +63,19 @@ public class DefaultView extends AbstractView {
 	}
     }
 
-    protected void loadImages() {
+    public void setModelAdapter(IModelAdapter modelAdpt) {
+	super.setModelAdapter(modelAdpt);
+	if (modelAdpt != null) {
+	    SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		    resetGUI();
+		}
+	    });
+	}
+    }
+
+    void loadImages() {
+	images = new HashMap<String, Image>();
 	Properties prop = new Properties();
 	String propertiesFileName = "images/images.properties";
 	InputStream is = getClass().getClassLoader().getResourceAsStream(
@@ -92,22 +110,45 @@ public class DefaultView extends AbstractView {
 	return images.get(key);
     }
 
+    public IViewState getViewState() {
+	return viewState;
+    }
+
+    public void setViewState(IViewState aState) {
+	this.viewState = aState;
+	try {
+	    getModelAdapter().requestUpdate();
+	} catch (RemoteException e) {
+	    e.printStackTrace();
+	}
+    }
+
+    JPanel initGridPanel() {
+	return new JPanel() {
+	    /**
+	     * 
+	     */
+	    private static final long serialVersionUID = -1994204987640877393L;
+
+	    public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		try {
+		    getModelAdapter().getUpdateDelegate().update(g,
+			    DefaultView.this);
+		} catch (RemoteException e1) {
+		    e1.printStackTrace();
+		}
+		getViewState().update(g);
+	    }
+	};
+    }
+
     public void resetGUI() {
 	if (isResettingGUI)
 	    return;
 	isResettingGUI = true;
 	this.removeAll();
-	pnl_grid = new JPanel() {
-	    public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		try {
-		    getModelAdapter().update(g, DefaultView.this);
-		} catch (RemoteException e) {
-		    e.printStackTrace();
-		}
-		getViewState().update(g);
-	    }
-	};
+	pnl_grid = initGridPanel();
 	pnl_func = new JPanel();
 
 	pnl_grid.setPreferredSize(new Dimension(GRID_WIDTH, GRID_HEIGHT));
@@ -172,7 +213,7 @@ public class DefaultView extends AbstractView {
 	add(pnl_grid, BorderLayout.CENTER);
 	add(pnl_func, BorderLayout.SOUTH);
 	setPreferredSize(getPreferredSize());
-	setViewState(new InitState(this));
+	setViewState(new InitialState(this));
 	isResettingGUI = false;
     }
 

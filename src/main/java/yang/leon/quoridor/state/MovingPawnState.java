@@ -15,6 +15,11 @@ import yang.leon.quoridor.Location;
 
 public class MovingPawnState extends IViewState {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1277736410447138262L;
+
     public MovingPawnState(AbstractView context) {
 	super(context);
     }
@@ -22,7 +27,7 @@ public class MovingPawnState extends IViewState {
     @Override
     public void mousePressed(MouseEvent e) {
 	if (SwingUtilities.isRightMouseButton(e)) {
-	    getContext().setViewState(new InitState(getContext()));
+	    getContext().setViewState(new InitialState(getContext()));
 	    return;
 	}
 	if (!SwingUtilities.isLeftMouseButton(e))
@@ -32,7 +37,7 @@ public class MovingPawnState extends IViewState {
 	ArrayList<Location> canMoveLocs = null;
 	try {
 	    canMoveLocs = adpt.getCanMoveLocs(adpt.getPlayer(
-	    	adpt.getCurrPlayerIndex()).getPawnLoc());
+		    adpt.getCurrPlayerIndex()).getPawnLoc());
 	} catch (RemoteException e1) {
 	    e1.printStackTrace();
 	}
@@ -40,15 +45,19 @@ public class MovingPawnState extends IViewState {
 	    return;
 	try {
 	    if (adpt.movePawn(loc)) {
-	        getContext().win(adpt.getCurrPlayerIndex());
-	        return;
+		getContext().win(adpt.getCurrPlayerIndex());
+		return;
 	    }
 	} catch (RemoteException e1) {
 	    e1.printStackTrace();
 	}
 	try {
-	    adpt.nextPlayer(getContext());
-	} catch (RemoteException e1) {
+	    String name = "yang.leon.quoridor.state." + adpt.nextPlayer();
+	    IViewState newState = (IViewState) Class.forName(name)
+		    .getConstructor(AbstractView.class)
+		    .newInstance(getContext());
+	    getContext().setViewState(newState);
+	} catch (Exception e1) {
 	    e1.printStackTrace();
 	}
     }
@@ -63,8 +72,7 @@ public class MovingPawnState extends IViewState {
 	IModelAdapter adpt = getContext().getModelAdapter();
 	Location pawnLoc = null;
 	try {
-	    pawnLoc = adpt.getPlayer(adpt.getCurrPlayerIndex())
-	    	.getPawnLoc();
+	    pawnLoc = adpt.getPlayer(adpt.getCurrPlayerIndex()).getPawnLoc();
 	} catch (RemoteException e) {
 	    e.printStackTrace();
 	    return;

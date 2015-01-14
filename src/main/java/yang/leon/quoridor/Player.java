@@ -1,8 +1,14 @@
 package yang.leon.quoridor;
 
 import java.awt.Graphics;
+import java.io.Serializable;
 
-public class Player {
+public class Player implements Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1156188417186445415L;
 
     private static final int TOTAL_WALLS = 20;
 

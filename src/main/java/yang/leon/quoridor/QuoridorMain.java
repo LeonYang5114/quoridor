@@ -21,32 +21,39 @@ public class QuoridorMain extends JFrame {
     }
 
     public static void main(String[] args) {
-//	try {
-//	    AbstractController controller = new DefaultController(3);
-//	    AbstractView view = new DefaultView(controller);
-//	    String name = "ModelAdapter";
-//	    IModelAdapter stub = (IModelAdapter) UnicastRemoteObject
-//		    .exportObject(controller, 2040);
-//	    Registry registry = LocateRegistry.createRegistry(1099);
-//	    registry.rebind(name, stub);
-//	    System.out.println("ComputeEngine bound");
-//	    new QuoridorMain(view);
-//	} catch (Exception e) {
-//	    System.err.println("ComputeEngine exception:");
-//	    e.printStackTrace();
-//	}
+	server();
+//	client();
+    }
 
+    private static void client() {
 	try {
 	    String name = "ModelAdapter";
-	    Registry registry = LocateRegistry.getRegistry("192.168.0.103");
+	    Registry registry = LocateRegistry.getRegistry("216.26.121.22");
 	    IModelAdapter modelAdpt = (IModelAdapter) registry.lookup(name);
-	    AbstractView view = new DefaultView(modelAdpt);
-	    System.out.println(view.getPreferredSize());
+	    AbstractView view = new ClientView(modelAdpt);
 	    new QuoridorMain(view);
 	} catch (Exception e) {
-	    System.err.println("ComputePi exception:");
+	    System.err.println("View exception:");
 	    e.printStackTrace();
 	}
+    }
+
+    private static void server() {
+	try {
+	    System.setProperty("java.rmi.server.hostname", "216.26.121.22");
+	    AbstractController controller = new DefaultController(3);
+	    AbstractView view = new DefaultView(controller);
+	    String name = "ModelAdapter";
+	    IModelAdapter stub = (IModelAdapter) UnicastRemoteObject
+		    .exportObject(controller, 2040);
+	    Registry registry = LocateRegistry.createRegistry(1099);
+	    registry.rebind(name, stub);
+	    new QuoridorMain(view);
+	} catch (Exception e) {
+	    System.err.println("Controller exception:");
+	    e.printStackTrace();
+	}
+
     }
 
 }

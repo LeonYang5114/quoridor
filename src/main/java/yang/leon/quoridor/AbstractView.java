@@ -3,18 +3,21 @@ package yang.leon.quoridor;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
+import java.io.Serializable;
 
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import yang.leon.quoridor.state.IViewState;
 
-public abstract class AbstractView extends JPanel {
+public abstract class AbstractView extends JPanel implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6068677166330116230L;
+
     public static final int GRID_WIDTH = 450, GRID_HEIGHT = 450;
 
     private IModelAdapter modelAdpt;
-
-    private IViewState viewState;
 
     public abstract Image getImage(String key);
 
@@ -54,24 +57,11 @@ public abstract class AbstractView extends JPanel {
 
     public void setModelAdapter(IModelAdapter modelAdpt) {
 	this.modelAdpt = modelAdpt;
-	System.out.println("Model adapter set.");
-	System.out.println(modelAdpt == null);
-	if (modelAdpt != null)
-	    SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    resetGUI();
-		}
-	    });
     }
 
-    public IViewState getViewState() {
-	return viewState;
-    }
+    public abstract IViewState getViewState();
 
-    public void setViewState(IViewState aState) {
-	this.viewState = aState;
-	update();
-    }
+    public abstract void setViewState(IViewState aState);
 
     public abstract void resetGUI();
 
@@ -80,12 +70,26 @@ public abstract class AbstractView extends JPanel {
     public abstract JPanel getGridPanel();
 
     public abstract void drawWall(Graphics g, Point p, int direction, String arg);
-    
+
     public abstract void drawBackground(Graphics g);
-    
+
     public abstract void drawPawn(Graphics g, Point p);
 
     public abstract void win(int currPlayerIndex);
 
     public abstract void disableButtons();
+
+    public boolean equals(Object obj) {
+	if (obj == null || !(obj instanceof AbstractView))
+	    return false;
+	AbstractView view = (AbstractView) obj;
+
+	if (getViewState() != null) {
+	    if (!getViewState().equals(view.getViewState()))
+		return false;
+	} else if (view.getViewState() != null)
+	    return false;
+
+	return true;
+    }
 }

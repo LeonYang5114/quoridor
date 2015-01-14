@@ -1,12 +1,13 @@
 package yang.leon.quoridor;
 
-import java.awt.Graphics;
 import java.util.ArrayList;
 
 public class DefaultController extends AbstractController {
 
     private ArrayList<AbstractView> views;
     private AbstractModel model;
+
+    private AbstractView updatingView;
 
     public DefaultController() {
 	this(2);
@@ -21,12 +22,16 @@ public class DefaultController extends AbstractController {
 	setModel(model);
     }
 
+    public AbstractView getUpdatingView() {
+	return updatingView;
+    }
+
     public void setModel(AbstractModel abstractModel) {
 	if (model != null)
 	    model.setViewAdapter(null);
 	model = (abstractModel != null) ? abstractModel : new DefaultModel(2);
 	model.setViewAdapter(this);
-	update(null);
+	update();
     }
 
     public void registerView(AbstractView abstractView) {
@@ -65,8 +70,8 @@ public class DefaultController extends AbstractController {
     }
 
     @Override
-    public void nextPlayer(AbstractView context) {
-	model.nextPlayer(context);
+    public String nextPlayer() {
+	return model.nextPlayer();
     }
 
     @Override
@@ -75,15 +80,34 @@ public class DefaultController extends AbstractController {
     }
 
     @Override
-    public void update(Graphics g, AbstractView context) {
-	model.update(g, context);
+    public AbstractModel getUpdateDelegate() {
+	return model.getUpdateDelegate();
     }
 
     @Override
-    public void update(AbstractView invoker) {
-	for (AbstractView view : views)
-	    if (!view.equals(invoker))
-		view.update();
+    public void requestWaitForUpdate() {
+	model.requestWaitForUpdate();
+    }
+
+    @Override
+    public void doneWithUpdateNotify(AbstractView context) {
+	if (updatingView == null || context.equals(updatingView)) {
+	    model.doneWithUpdateNotify();
+	    updatingView = null;
+	}
+    }
+
+    @Override
+    public void update() {
+	for (AbstractView view : views) {
+	    updatingView = view;
+	    view.update();
+	}
+    }
+    
+    @Override
+    public void requestUpdate() {
+	update();
     }
 
 }

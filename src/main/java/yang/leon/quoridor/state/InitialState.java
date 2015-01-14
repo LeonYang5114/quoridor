@@ -11,9 +11,14 @@ import yang.leon.quoridor.DefaultView;
 import yang.leon.quoridor.IModelAdapter;
 import yang.leon.quoridor.Location;
 
-public class InitState extends IViewState {
+public class InitialState extends IViewState {
 
-    public InitState(AbstractView context) {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2143097583796965991L;
+
+    public InitialState(AbstractView context) {
 	super(context);
     }
 
@@ -21,11 +26,12 @@ public class InitState extends IViewState {
     public void mousePressed(MouseEvent e) {
 	if (!SwingUtilities.isLeftMouseButton(e))
 	    return;
-	Location loc = DefaultView.getSqrLocAtPoint(e.getPoint());
+	Location loc = AbstractView.getSqrLocAtPoint(e.getPoint());
 	IModelAdapter adpt = getContext().getModelAdapter();
 	try {
-	    if (adpt.getPlayer(adpt.getCurrPlayerIndex()).getPawnLoc().equals(loc))
+	    if (adpt.getPlayer(adpt.getCurrPlayerIndex()).getPawnLoc().equals(loc)) {
 	        getContext().setViewState(new MovingPawnState(getContext()));
+	    }
 	} catch (RemoteException e1) {
 	    e1.printStackTrace();
 	}

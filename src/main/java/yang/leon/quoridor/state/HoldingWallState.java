@@ -18,6 +18,10 @@ import yang.leon.quoridor.Location;
 
 public class HoldingWallState extends IViewState {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3283918408413745061L;
     private int direction;
     private Point mouseLocation;
     private static final int DELAY = 350;
@@ -54,10 +58,14 @@ public class HoldingWallState extends IViewState {
 	IModelAdapter adpt = getContext().getModelAdapter();
 	try {
 	    if (adpt.isCanPutWall(loc, direction)) {
-	        adpt.putWall(loc, direction);
-	        adpt.nextPlayer(getContext());
+		adpt.putWall(loc, direction);
+		String name = "yang.leon.quoridor.state." + adpt.nextPlayer();
+		IViewState newState = (IViewState) Class.forName(name)
+			.getConstructor(AbstractView.class)
+			.newInstance(getContext());
+		getContext().setViewState(newState);
 	    }
-	} catch (RemoteException e1) {
+	} catch (Exception e1) {
 	    e1.printStackTrace();
 	}
     }
@@ -78,9 +86,10 @@ public class HoldingWallState extends IViewState {
 	Location loc = DefaultView.getCrsLocAtPoint(mouseLocation);
 	try {
 	    if (showPuttingLoc
-	    	&& getContext().getModelAdapter().isCanPutWall(loc, direction)) {
-	        Point putting = DefaultView.getPointFromCrsLoc(loc);
-	        getContext().drawWall(g, putting, direction, "light");
+		    && getContext().getModelAdapter().isCanPutWall(loc,
+			    direction)) {
+		Point putting = DefaultView.getPointFromCrsLoc(loc);
+		getContext().drawWall(g, putting, direction, "light");
 	    }
 	} catch (RemoteException e) {
 	    e.printStackTrace();

@@ -1,9 +1,15 @@
 package yang.leon.quoridor;
 
 import java.awt.Graphics;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class AbstractModel {
+public abstract class AbstractModel implements Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5485403923299219883L;
 
     public static final int WIDTH = 9, HEIGHT = 9;
 
@@ -14,15 +20,40 @@ public abstract class AbstractModel {
 	    VERTICAL_WALL = 2;
 
     public static final int TOTAL_WALLS = 20;
-    
-    private IViewAdapter viewAdpt;
-    
+
+    private transient IViewAdapter viewAdpt;
+
+    private AbstractModel updateDelegate;
+
+    private boolean hasDoneWithUpdate;
+    public static final int UPDATE_TIME_OUT = 5000;
+
     public IViewAdapter getViewAdapter() {
 	return viewAdpt;
     }
-    
+
     public void setViewAdapter(IViewAdapter viewAdpt) {
 	this.viewAdpt = viewAdpt;
+    }
+
+    public AbstractModel getUpdateDelegate() {
+	return updateDelegate;
+    }
+
+    public void setUpdateDelegate(AbstractModel updateDelegate) {
+	this.updateDelegate = updateDelegate;
+    }
+
+    protected boolean hasDoneWithUpdate() {
+	return hasDoneWithUpdate;
+    }
+
+    public void doneWithUpdateNotify() {
+	hasDoneWithUpdate = true;
+    }
+
+    public void resetDoneWithUpdate() {
+	hasDoneWithUpdate = false;
     }
 
     public abstract ArrayList<Location> getCanMoveLocs(Location loc);
@@ -37,10 +68,12 @@ public abstract class AbstractModel {
 
     public abstract int getNumPlayers();
 
-    public abstract void nextPlayer(AbstractView context);
+    public abstract String nextPlayer();
+
+    public abstract void requestWaitForUpdate();
 
     public abstract int getCurrPlayerIndex();
-    
+
     public abstract void update(Graphics g, AbstractView context);
 
 }
