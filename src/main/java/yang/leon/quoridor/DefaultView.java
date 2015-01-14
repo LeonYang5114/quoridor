@@ -50,6 +50,8 @@ public class DefaultView extends AbstractView {
 
     private IViewState viewState;
 
+    private AbstractModel updateDelegate;
+
     public DefaultView() {
 	loadImages();
     }
@@ -66,6 +68,11 @@ public class DefaultView extends AbstractView {
     public void setModelAdapter(IModelAdapter modelAdpt) {
 	super.setModelAdapter(modelAdpt);
 	if (modelAdpt != null) {
+	    try {
+		setUpdateDelegate(modelAdpt.getUpdateDelegate());
+	    } catch (RemoteException e1) {
+		e1.printStackTrace();
+	    }
 	    SwingUtilities.invokeLater(new Runnable() {
 		public void run() {
 		    resetGUI();
@@ -132,12 +139,7 @@ public class DefaultView extends AbstractView {
 
 	    public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		try {
-		    getModelAdapter().getUpdateDelegate().update(g,
-			    DefaultView.this);
-		} catch (RemoteException e1) {
-		    e1.printStackTrace();
-		}
+		getUpdateDelegate().update(g, DefaultView.this);
 		getViewState().update(g);
 	    }
 	};
@@ -220,12 +222,21 @@ public class DefaultView extends AbstractView {
     public JPanel getGridPanel() {
 	return pnl_grid;
     }
+    
+    public AbstractModel getUpdateDelegate() {
+	return updateDelegate;
+    }
+    
+    public void setUpdateDelegate(AbstractModel delegate) {
+	updateDelegate = delegate;
+    }
 
     public void update() {
 	IModelAdapter modelAdpt = getModelAdapter();
 	if (modelAdpt == null)
 	    return;
 	try {
+	    setUpdateDelegate(modelAdpt.getUpdateDelegate());
 	    lb_numWalls.setText("X "
 		    + modelAdpt.getPlayer(modelAdpt.getCurrPlayerIndex())
 			    .getNumWalls());

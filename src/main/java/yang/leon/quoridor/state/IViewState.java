@@ -34,42 +34,6 @@ public abstract class IViewState implements Serializable {
     }
 
     public abstract void update(Graphics g);
-
-    public void drawCurrPlayer(Graphics g) {
-	IModelAdapter adpt = getContext().getModelAdapter();
-	Player player = null;
-	try {
-	    player = adpt.getPlayer(adpt.getCurrPlayerIndex());
-	} catch (RemoteException e) {
-	    e.printStackTrace();
-	}
-	if (player == null)
-	    return;
-	switch (player.getTargetEdge()) {
-	case DefaultModel.NORTH_EDGE:
-	    g.drawImage(getContext().getImage("target.edge.horizontal"), 0, 0,
-		    null);
-	    break;
-	case DefaultModel.WEST_EDGE:
-	    g.drawImage(getContext().getImage("target.edge.vertical"), 0, 0,
-		    null);
-	    break;
-	case DefaultModel.SOUTH_EDGE:
-	    g.drawImage(getContext().getImage("target.edge.horizontal"), 0,
-		    404, null);
-	    break;
-	case DefaultModel.EAST_EDGE:
-	    g.drawImage(getContext().getImage("target.edge.vertical"), 404, 0,
-		    null);
-	    break;
-	default:
-	    break;
-	}
-	Location pawnLoc = player.getPawnLoc();
-	Point pawnPoint = DefaultView.getPointFromSqrLoc(pawnLoc);
-	g.drawImage(getContext().getImage("current.pawn"), pawnPoint.x,
-		pawnPoint.y, null);
-    }
     
     public boolean equals(Object obj) {
 	if (obj == null)

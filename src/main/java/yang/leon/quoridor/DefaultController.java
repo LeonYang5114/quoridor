@@ -1,10 +1,12 @@
 package yang.leon.quoridor;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class DefaultController extends AbstractController {
 
     private ArrayList<AbstractView> views;
+    private ArrayList<ICallbackClientView> callbackViews;
     private AbstractModel model;
 
     private AbstractView updatingView;
@@ -19,6 +21,7 @@ public class DefaultController extends AbstractController {
 
     public DefaultController(AbstractModel model) {
 	views = new ArrayList<AbstractView>();
+	callbackViews = new ArrayList<ICallbackClientView>();
 	setModel(model);
     }
 
@@ -34,9 +37,20 @@ public class DefaultController extends AbstractController {
 	update();
     }
 
+    @Override
     public void registerView(AbstractView abstractView) {
 	views.add(abstractView);
 	abstractView.setModelAdapter(this);
+    }
+    
+    @Override
+    public void registerView(ICallbackClientView callbackView) {
+	callbackViews.add(callbackView);
+	try {
+	    callbackView.setModelAdapter(this);
+	} catch (RemoteException e) {
+	    e.printStackTrace();
+	}
     }
 
     @Override
@@ -99,6 +113,13 @@ public class DefaultController extends AbstractController {
 
     @Override
     public void update() {
+	for (ICallbackClientView callbackView: callbackViews) {
+	    try {
+		callbackView.update();
+	    } catch (RemoteException e) {
+		e.printStackTrace();
+	    }
+	}
 	for (AbstractView view : views) {
 	    updatingView = view;
 	    view.update();

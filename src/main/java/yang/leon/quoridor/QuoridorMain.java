@@ -21,11 +21,31 @@ public class QuoridorMain extends JFrame {
     }
 
     public static void main(String[] args) {
-	server();
-//	client();
+//	server();
+	callbackClient();
     }
 
-    private static void client() {
+    public static void callbackClient() {
+	try {
+	    CallbackClientView callbackView = new CallbackClientView();
+	    String name = "CallbackClientView";
+	    ICallbackClientView stub = (ICallbackClientView) UnicastRemoteObject
+		    .exportObject(callbackView, 1940);
+	    Registry registry = LocateRegistry.createRegistry(999);
+	    registry.rebind(name, stub);
+	    name = "ModelAdapter";
+	    registry = LocateRegistry.getRegistry("216.26.121.22");
+	    IModelAdapter modelAdpt = (IModelAdapter) registry.lookup(name);
+	    modelAdpt.registerView(stub);
+	    new QuoridorMain(callbackView);
+	} catch (Exception e) {
+	    System.err.println("View exception:");
+	    e.printStackTrace();
+	}
+
+    }
+
+    public static void client() {
 	try {
 	    String name = "ModelAdapter";
 	    Registry registry = LocateRegistry.getRegistry("216.26.121.22");
@@ -38,7 +58,7 @@ public class QuoridorMain extends JFrame {
 	}
     }
 
-    private static void server() {
+    public static void server() {
 	try {
 	    System.setProperty("java.rmi.server.hostname", "216.26.121.22");
 	    AbstractController controller = new DefaultController(3);

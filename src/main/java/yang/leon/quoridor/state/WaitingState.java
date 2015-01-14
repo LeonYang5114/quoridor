@@ -27,7 +27,6 @@ public class WaitingState extends IViewState {
 
     @Override
     public void update(Graphics g) {
-	drawCurrPlayer(g);
     }
     
     public String toString() {

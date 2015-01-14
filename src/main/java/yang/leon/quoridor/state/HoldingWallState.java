@@ -75,12 +75,11 @@ public class HoldingWallState extends IViewState {
 	mouseLocation = e.getPoint();
 	showPuttingLoc = false;
 	timer.restart();
-	getContext().update();
+	getContext().repaint();
     }
 
     @Override
     public void update(Graphics g) {
-	drawCurrPlayer(g);
 	if (mouseLocation == null)
 	    return;
 	Location loc = DefaultView.getCrsLocAtPoint(mouseLocation);

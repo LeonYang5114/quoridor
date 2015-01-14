@@ -68,7 +68,6 @@ public class MovingPawnState extends IViewState {
 
     @Override
     public void update(Graphics g) {
-	drawCurrPlayer(g);
 	IModelAdapter adpt = getContext().getModelAdapter();
 	Location pawnLoc = null;
 	try {

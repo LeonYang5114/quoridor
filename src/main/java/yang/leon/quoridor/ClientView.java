@@ -21,8 +21,6 @@ public class ClientView extends DefaultView {
 
     private AbstractView viewDelegate;
 
-    private AbstractModel updateDelegate;
-
     public ClientView() {
 	this(null);
     }
@@ -57,7 +55,7 @@ public class ClientView extends DefaultView {
 		try {
 		    AbstractView updating = adpt.getUpdatingView();
 		    if (viewDelegate.equals(updating)) {
-			updateDelegate = adpt.getUpdateDelegate();
+			setUpdateDelegate(adpt.getUpdateDelegate());
 			repaint();
 			getModelAdapter().doneWithUpdateNotify(viewDelegate);
 		    }
@@ -69,7 +67,7 @@ public class ClientView extends DefaultView {
 	});
 	setModelAdapter(modelAdpt);
 	try {
-	    updateDelegate = modelAdpt.getUpdateDelegate();
+	    setUpdateDelegate(modelAdpt.getUpdateDelegate());
 	} catch (RemoteException e1) {
 	    e1.printStackTrace();
 	}
@@ -85,7 +83,7 @@ public class ClientView extends DefaultView {
 
 	    public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		updateDelegate.update(g, ClientView.this);
+		getUpdateDelegate().update(g, ClientView.this);
 		getViewState().update(g);
 	    }
 	};

@@ -2,6 +2,7 @@ package yang.leon.quoridor;
 
 import java.awt.Graphics;
 import java.awt.Point;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -167,7 +168,6 @@ public class DefaultModel extends AbstractModel {
 	squares[oldLoc.getRow()][oldLoc.getCol()] = false;
 	squares[newLoc.getRow()][newLoc.getCol()] = true;
 	currPlayer.setPawnLoc(newLoc);
-	setUpdateDelegate(createUpdateDelegate());
 	return isOnEdge(currPlayer.getPawnLoc(), currPlayer.getTargetEdge());
     }
 
@@ -175,7 +175,6 @@ public class DefaultModel extends AbstractModel {
 	crossings[loc.getRow()][loc.getCol()] = direction;
 	players[currPlayerIndex].setNumWalls(players[currPlayerIndex]
 		.getNumWalls() - 1);
-	setUpdateDelegate(createUpdateDelegate());
     }
 
     public Player getPlayer(int playerIndex) {
@@ -189,6 +188,7 @@ public class DefaultModel extends AbstractModel {
     public String nextPlayer() {
 	currPlayerIndex++;
 	currPlayerIndex %= players.length;
+	setUpdateDelegate(createUpdateDelegate());
 	return "InitialState";
     }
 
@@ -241,6 +241,29 @@ public class DefaultModel extends AbstractModel {
 	    }
 	}
 
+	Player player = getPlayer(getCurrPlayerIndex());
+	String targetEdgeKey = null;
+	switch (player.getTargetEdge()) {
+	case DefaultModel.NORTH_EDGE:
+	    targetEdgeKey = "target.edge.horizontal";
+	    break;
+	case DefaultModel.WEST_EDGE:
+	    targetEdgeKey = "target.edge.vertical";
+	    break;
+	case DefaultModel.SOUTH_EDGE:
+	    targetEdgeKey = "target.edge.horizontal";
+	    break;
+	case DefaultModel.EAST_EDGE:
+	    targetEdgeKey = "target.edge.vertical";
+	    break;
+	default:
+	    break;
+	}
+	final String key = targetEdgeKey;
+
+	Location pawnLoc = player.getPawnLoc();
+	final Point pawnPoint = DefaultView.getPointFromSqrLoc(pawnLoc);
+
 	return new DelegateModel() {
 	    /**
 	     * 
@@ -249,11 +272,17 @@ public class DefaultModel extends AbstractModel {
 
 	    public void update(Graphics g, AbstractView context) {
 		context.drawBackground(g);
+
 		for (Point p : drawPawnPoints)
 		    context.drawPawn(g, p);
+
 		for (Object[] o : drawWallParas) {
 		    context.drawWall(g, (Point) o[0], (int) o[1], null);
 		}
+
+		g.drawImage(context.getImage(key), 0, 0, null);
+		g.drawImage(context.getImage("current.pawn"), pawnPoint.x,
+			pawnPoint.y, null);
 	    }
 	};
 
