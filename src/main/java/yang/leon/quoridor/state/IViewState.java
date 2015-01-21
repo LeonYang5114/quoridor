@@ -6,10 +6,10 @@ import java.awt.event.MouseEvent;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 
-import yang.leon.quoridor.AbstractView;
+import yang.leon.quoridor.AbstractGameView;
 import yang.leon.quoridor.DefaultModel;
 import yang.leon.quoridor.DefaultView;
-import yang.leon.quoridor.IModelAdapter;
+import yang.leon.quoridor.IRemoteModelAdapter;
 import yang.leon.quoridor.Location;
 import yang.leon.quoridor.Player;
 
@@ -19,9 +19,9 @@ public abstract class IViewState implements Serializable {
      * 
      */
     private static final long serialVersionUID = 166356488156092621L;
-    private AbstractView context;
+    private AbstractGameView context;
 
-    public IViewState(AbstractView context) {
+    public IViewState(AbstractGameView context) {
 	this.context = context;
     }
 
@@ -29,7 +29,7 @@ public abstract class IViewState implements Serializable {
 
     public abstract void mouseMoved(MouseEvent e);
 
-    public AbstractView getContext() {
+    public AbstractGameView getContext() {
 	return context;
     }
 

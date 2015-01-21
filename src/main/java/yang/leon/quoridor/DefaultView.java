@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.rmi.RemoteException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +22,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import yang.leon.quoridor.state.HoldingWallState;
 import yang.leon.quoridor.state.IViewState;
@@ -31,12 +29,15 @@ import yang.leon.quoridor.state.InitialState;
 import yang.leon.quoridor.state.MovingPawnState;
 import yang.leon.quoridor.state.WonState;
 
-public class DefaultView extends AbstractView {
+public class DefaultView extends AbstractGameView {
 
     /**
      * 
      */
     private static final long serialVersionUID = 6783231460747770839L;
+
+    private IModelAdapter modelAdpt;
+
     private JPanel pnl_grid;
     private JPanel pnl_func;
 
@@ -50,35 +51,27 @@ public class DefaultView extends AbstractView {
 
     private IViewState viewState;
 
-    private AbstractModel updateDelegate;
+    private AbstractGameModel updateDelegate;
 
     public DefaultView() {
 	loadImages();
     }
 
-    public DefaultView(IModelAdapter modelAdpt) {
+    public DefaultView(AbstractGameController controller) {
 	loadImages();
-	try {
-	    modelAdpt.registerView(this);
-	} catch (RemoteException e) {
-	    e.printStackTrace();
-	}
+	controller.registerView(this);
     }
 
     public void setModelAdapter(IModelAdapter modelAdpt) {
-	super.setModelAdapter(modelAdpt);
+	this.modelAdpt = modelAdpt;
 	if (modelAdpt != null) {
-	    try {
-		setUpdateDelegate(modelAdpt.getUpdateDelegate());
-	    } catch (RemoteException e1) {
-		e1.printStackTrace();
-	    }
-	    SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    resetGUI();
-		}
-	    });
+	    setUpdateDelegate(modelAdpt.getUpdateDelegate());
+	    resetGUI();
 	}
+    }
+
+    public IModelAdapter getModelAdapter() {
+	return modelAdpt;
     }
 
     void loadImages() {
@@ -123,11 +116,7 @@ public class DefaultView extends AbstractView {
 
     public void setViewState(IViewState aState) {
 	this.viewState = aState;
-	try {
-	    getModelAdapter().requestUpdate();
-	} catch (RemoteException e) {
-	    e.printStackTrace();
-	}
+	getModelAdapter().updateAllViews();
     }
 
     JPanel initGridPanel() {
@@ -139,6 +128,8 @@ public class DefaultView extends AbstractView {
 
 	    public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		if (getUpdateDelegate() == null)
+		    return;
 		getUpdateDelegate().update(g, DefaultView.this);
 		getViewState().update(g);
 	    }
@@ -222,27 +213,23 @@ public class DefaultView extends AbstractView {
     public JPanel getGridPanel() {
 	return pnl_grid;
     }
-    
-    public AbstractModel getUpdateDelegate() {
+
+    public AbstractGameModel getUpdateDelegate() {
 	return updateDelegate;
     }
-    
-    public void setUpdateDelegate(AbstractModel delegate) {
+
+    public void setUpdateDelegate(AbstractGameModel delegate) {
 	updateDelegate = delegate;
     }
 
     public void update() {
 	IModelAdapter modelAdpt = getModelAdapter();
-	if (modelAdpt == null)
+	if (modelAdpt == null || modelAdpt.getUpdateDelegate() == null)
 	    return;
-	try {
-	    setUpdateDelegate(modelAdpt.getUpdateDelegate());
-	    lb_numWalls.setText("X "
-		    + modelAdpt.getPlayer(modelAdpt.getCurrPlayerIndex())
-			    .getNumWalls());
-	} catch (RemoteException e) {
-	    e.printStackTrace();
-	}
+	setUpdateDelegate(modelAdpt.getUpdateDelegate());
+	lb_numWalls.setText("X "
+		+ modelAdpt.getPlayer(modelAdpt.getCurrPlayerIndex())
+			.getNumWalls());
 	repaint();
     }
 

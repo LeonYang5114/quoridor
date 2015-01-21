@@ -1,56 +1,40 @@
 package yang.leon.quoridor;
 
+import java.awt.Graphics;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class DefaultController extends AbstractController {
+public class DefaultController extends AbstractGameController {
 
-    private ArrayList<AbstractView> views;
-    private ArrayList<ICallbackClientView> callbackViews;
-    private AbstractModel model;
+    private AbstractGameView view;
+    private AbstractGameModel model;
 
-    private AbstractView updatingView;
+    private AbstractModeController modeController;
 
     public DefaultController() {
-	this(2);
+	this(null);
     }
 
     public DefaultController(int numPlayers) {
 	this(new DefaultModel(numPlayers));
     }
 
-    public DefaultController(AbstractModel model) {
-	views = new ArrayList<AbstractView>();
-	callbackViews = new ArrayList<ICallbackClientView>();
-	setModel(model);
+    public DefaultController(AbstractGameModel gameModel) {
+	registerModel(gameModel);
     }
 
-    public AbstractView getUpdatingView() {
-	return updatingView;
+    public void setModeController(AbstractModeController controller) {
+	modeController = controller;
     }
 
-    public void setModel(AbstractModel abstractModel) {
-	if (model != null)
-	    model.setViewAdapter(null);
-	model = (abstractModel != null) ? abstractModel : new DefaultModel(2);
-	model.setViewAdapter(this);
-	update();
+    public AbstractModeController getModeController() {
+	return modeController;
     }
 
     @Override
-    public void registerView(AbstractView abstractView) {
-	views.add(abstractView);
-	abstractView.setModelAdapter(this);
-    }
-    
-    @Override
-    public void registerView(ICallbackClientView callbackView) {
-	callbackViews.add(callbackView);
-	try {
-	    callbackView.setModelAdapter(this);
-	} catch (RemoteException e) {
-	    e.printStackTrace();
-	}
+    public void update() {
+	if (getView() != null)
+	    getView().update();
     }
 
     @Override
@@ -94,41 +78,45 @@ public class DefaultController extends AbstractController {
     }
 
     @Override
-    public AbstractModel getUpdateDelegate() {
-	return model.getUpdateDelegate();
+    public AbstractGameModel getUpdateDelegate() {
+	return (model == null) ? null : model.getUpdateDelegate();
     }
 
     @Override
-    public void requestWaitForUpdate() {
-	model.requestWaitForUpdate();
+    public void update(Graphics g, AbstractGameView context) {
+	model.update(g, context);
     }
 
     @Override
-    public void doneWithUpdateNotify(AbstractView context) {
-	if (updatingView == null || context.equals(updatingView)) {
-	    model.doneWithUpdateNotify();
-	    updatingView = null;
+    public void updateAllViews() {
+	update();
+    }
+
+    @Override
+    public void registerModel(AbstractGameModel gameModel) {
+	if (model != null)
+	    model.setViewAdapter(null);
+	model = gameModel;
+	if (model != null) {
+	    model.setViewAdapter(this);
+	    update();
 	}
     }
 
     @Override
-    public void update() {
-	for (ICallbackClientView callbackView: callbackViews) {
-	    try {
-		callbackView.update();
-	    } catch (RemoteException e) {
-		e.printStackTrace();
-	    }
-	}
-	for (AbstractView view : views) {
-	    updatingView = view;
-	    view.update();
-	}
+    public void registerView(AbstractGameView gameView) {
+	if (getView() != null)
+	    getView().setModelAdapter(null);
+	view = ((gameView != null) ? gameView : new DefaultView());
+	getView().setModelAdapter(this);
+    }
+
+    public AbstractGameView getView() {
+	return view;
     }
     
-    @Override
-    public void requestUpdate() {
-	update();
+    public AbstractGameModel getModel() {
+	return model;
     }
 
 }

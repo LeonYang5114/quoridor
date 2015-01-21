@@ -9,17 +9,13 @@ import javax.swing.JPanel;
 
 import yang.leon.quoridor.state.IViewState;
 
-public abstract class AbstractView extends JPanel implements Serializable {
+public abstract class AbstractGameView extends JPanel implements Serializable {
     /**
      * 
      */
     private static final long serialVersionUID = -6068677166330116230L;
 
     public static final int GRID_WIDTH = 450, GRID_HEIGHT = 450;
-
-    private IModelAdapter modelAdpt;
-
-    public abstract Image getImage(String key);
 
     public static Location getSqrLocAtPoint(Point point) {
 	int squareHeight = GRID_HEIGHT / DefaultModel.HEIGHT;
@@ -51,13 +47,11 @@ public abstract class AbstractView extends JPanel implements Serializable {
 		* squareHeight);
     }
 
-    public IModelAdapter getModelAdapter() {
-	return modelAdpt;
-    }
+    public abstract Image getImage(String key);
 
-    public void setModelAdapter(IModelAdapter modelAdpt) {
-	this.modelAdpt = modelAdpt;
-    }
+    public abstract IModelAdapter getModelAdapter();
+
+    public abstract void setModelAdapter(IModelAdapter modelAdpt);
 
     public abstract IViewState getViewState();
 
@@ -80,9 +74,9 @@ public abstract class AbstractView extends JPanel implements Serializable {
     public abstract void disableButtons();
 
     public boolean equals(Object obj) {
-	if (obj == null || !(obj instanceof AbstractView))
+	if (obj == null || !(obj instanceof AbstractGameView))
 	    return false;
-	AbstractView view = (AbstractView) obj;
+	AbstractGameView view = (AbstractGameView) obj;
 
 	if (getViewState() != null) {
 	    if (!getViewState().equals(view.getViewState()))

@@ -6,8 +6,7 @@ import java.rmi.RemoteException;
 
 import javax.swing.SwingUtilities;
 
-import yang.leon.quoridor.AbstractView;
-import yang.leon.quoridor.DefaultView;
+import yang.leon.quoridor.AbstractGameView;
 import yang.leon.quoridor.IModelAdapter;
 import yang.leon.quoridor.Location;
 
@@ -18,7 +17,7 @@ public class InitialState extends IViewState {
      */
     private static final long serialVersionUID = 2143097583796965991L;
 
-    public InitialState(AbstractView context) {
+    public InitialState(AbstractGameView context) {
 	super(context);
     }
 
@@ -26,14 +25,10 @@ public class InitialState extends IViewState {
     public void mousePressed(MouseEvent e) {
 	if (!SwingUtilities.isLeftMouseButton(e))
 	    return;
-	Location loc = AbstractView.getSqrLocAtPoint(e.getPoint());
+	Location loc = AbstractGameView.getSqrLocAtPoint(e.getPoint());
 	IModelAdapter adpt = getContext().getModelAdapter();
-	try {
-	    if (adpt.getPlayer(adpt.getCurrPlayerIndex()).getPawnLoc().equals(loc)) {
-	        getContext().setViewState(new MovingPawnState(getContext()));
-	    }
-	} catch (RemoteException e1) {
-	    e1.printStackTrace();
+	if (adpt.getPlayer(adpt.getCurrPlayerIndex()).getPawnLoc().equals(loc)) {
+	    getContext().setViewState(new MovingPawnState(getContext()));
 	}
     }
 

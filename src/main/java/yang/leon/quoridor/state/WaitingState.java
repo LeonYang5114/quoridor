@@ -3,7 +3,7 @@ package yang.leon.quoridor.state;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 
-import yang.leon.quoridor.AbstractView;
+import yang.leon.quoridor.AbstractGameView;
 
 public class WaitingState extends IViewState {
 
@@ -12,7 +12,7 @@ public class WaitingState extends IViewState {
      */
     private static final long serialVersionUID = -8034022749645426325L;
 
-    public WaitingState(AbstractView context) {
+    public WaitingState(AbstractGameView context) {
 	super(context);
 	getContext().disableButtons();
     }

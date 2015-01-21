@@ -3,7 +3,7 @@ package yang.leon.quoridor;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
-class DelegateModel extends AbstractModel {
+class DelegateModel extends AbstractGameModel {
 
     /**
      * 
@@ -50,11 +50,25 @@ class DelegateModel extends AbstractModel {
     }
 
     @Override
-    public void update(Graphics g, AbstractView context) {
+    public void update(Graphics g, AbstractGameView context) {
     }
 
     @Override
-    public void requestWaitForUpdate() {	
+    public IViewAdapter getViewAdapter() {
+	return null;
+    }
+
+    @Override
+    public void setViewAdapter(IViewAdapter viewAdpt) {
+    }
+
+    @Override
+    public AbstractGameModel getUpdateDelegate() {
+	return null;
+    }
+
+    @Override
+    public void setUpdateDelegate(AbstractGameModel updateDelegate) {	
     }
 
 }

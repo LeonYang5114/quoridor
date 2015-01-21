@@ -2,18 +2,30 @@ package yang.leon.quoridor;
 
 import java.awt.Graphics;
 import java.awt.Point;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.swing.SwingUtilities;
-
-public class DefaultModel extends AbstractModel {
+public class DefaultModel extends AbstractGameModel {
 
     /**
      * 
      */
     private static final long serialVersionUID = -3583850882738528510L;
+
+    public static final int WIDTH = 9, HEIGHT = 9;
+
+    public static final int NOT_ON_EDGE = -1, NORTH_EDGE = 0, EAST_EDGE = 1,
+	    SOUTH_EDGE = 2, WEST_EDGE = 3;
+
+    public static final int NO_WALL = 0, HORIZONTAL_WALL = 1,
+	    VERTICAL_WALL = 2;
+
+    public static final int TOTAL_WALLS = 20;
+
+    private transient IViewAdapter viewAdpt;
+
+    private AbstractGameModel updateDelegate;
+
     private boolean[][] squares;
     private int[][] crossings;
 
@@ -36,6 +48,26 @@ public class DefaultModel extends AbstractModel {
 	currPlayerIndex = 0;
 
 	setUpdateDelegate(createUpdateDelegate());
+    }
+
+    @Override
+    public IViewAdapter getViewAdapter() {
+	return viewAdpt;
+    }
+
+    @Override
+    public void setViewAdapter(IViewAdapter viewAdpt) {
+	this.viewAdpt = viewAdpt;
+    }
+
+    @Override
+    public AbstractGameModel getUpdateDelegate() {
+	return updateDelegate;
+    }
+
+    @Override
+    public void setUpdateDelegate(AbstractGameModel updateDelegate) {
+	this.updateDelegate = updateDelegate;
     }
 
     public ArrayList<Location> getCanMoveLocs(Location loc) {
@@ -168,7 +200,11 @@ public class DefaultModel extends AbstractModel {
 	squares[oldLoc.getRow()][oldLoc.getCol()] = false;
 	squares[newLoc.getRow()][newLoc.getCol()] = true;
 	currPlayer.setPawnLoc(newLoc);
-	return isOnEdge(currPlayer.getPawnLoc(), currPlayer.getTargetEdge());
+	if (isOnEdge(currPlayer.getPawnLoc(), currPlayer.getTargetEdge())) {
+	    setUpdateDelegate(createUpdateDelegate());
+	    return true;
+	}
+	return false;
     }
 
     public void putWall(Location loc, int direction) {
@@ -196,28 +232,11 @@ public class DefaultModel extends AbstractModel {
 	return currPlayerIndex;
     }
 
-    public void requestWaitForUpdate() {
-	SwingUtilities.invokeLater(new Runnable() {
-	    public void run() {
-		long start = System.currentTimeMillis();
-		while (!hasDoneWithUpdate()
-			&& System.currentTimeMillis() - start < UPDATE_TIME_OUT) {
-		    try {
-			Thread.sleep(10);
-		    } catch (InterruptedException e) {
-			e.printStackTrace();
-		    }
-		    Thread.yield();
-		}
-	    }
-	});
-    }
-
-    public void update(Graphics g, AbstractView context) {
+    public void update(Graphics g, AbstractGameView context) {
 	getUpdateDelegate().update(g, context);
     }
 
-    private AbstractModel createUpdateDelegate() {
+    private AbstractGameModel createUpdateDelegate() {
 
 	final ArrayList<Point> drawPawnPoints = new ArrayList<Point>();
 	for (int r = 0; r < HEIGHT; r++) {
@@ -243,18 +262,23 @@ public class DefaultModel extends AbstractModel {
 
 	Player player = getPlayer(getCurrPlayerIndex());
 	String targetEdgeKey = null;
+	final Point edgePoint = new Point();
 	switch (player.getTargetEdge()) {
 	case DefaultModel.NORTH_EDGE:
 	    targetEdgeKey = "target.edge.horizontal";
+	    edgePoint.setLocation(0, 0);
 	    break;
 	case DefaultModel.WEST_EDGE:
 	    targetEdgeKey = "target.edge.vertical";
+	    edgePoint.setLocation(0, 0);
 	    break;
 	case DefaultModel.SOUTH_EDGE:
 	    targetEdgeKey = "target.edge.horizontal";
+	    edgePoint.setLocation(0, 404);
 	    break;
 	case DefaultModel.EAST_EDGE:
 	    targetEdgeKey = "target.edge.vertical";
+	    edgePoint.setLocation(404, 0);
 	    break;
 	default:
 	    break;
@@ -270,7 +294,7 @@ public class DefaultModel extends AbstractModel {
 	     */
 	    private static final long serialVersionUID = -8449782332509624181L;
 
-	    public void update(Graphics g, AbstractView context) {
+	    public void update(Graphics g, AbstractGameView context) {
 		context.drawBackground(g);
 
 		for (Point p : drawPawnPoints)
@@ -280,7 +304,8 @@ public class DefaultModel extends AbstractModel {
 		    context.drawWall(g, (Point) o[0], (int) o[1], null);
 		}
 
-		g.drawImage(context.getImage(key), 0, 0, null);
+		g.drawImage(context.getImage(key), edgePoint.x, edgePoint.y,
+			null);
 		g.drawImage(context.getImage("current.pawn"), pawnPoint.x,
 			pawnPoint.y, null);
 	    }

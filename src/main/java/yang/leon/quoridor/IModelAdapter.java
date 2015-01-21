@@ -1,43 +1,29 @@
 package yang.leon.quoridor;
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
+import java.awt.Graphics;
 import java.util.ArrayList;
 
-public interface IModelAdapter extends Remote {
+public interface IModelAdapter {
+    
+    public AbstractGameModel getUpdateDelegate();
 
-    public void registerView(AbstractView abstractView) throws RemoteException;
+    public ArrayList<Location> getCanMoveLocs(Location loc);
 
-    public void registerView(ICallbackClientView callbackView)
-	    throws RemoteException;
+    public boolean isCanPutWall(Location loc, int direction);
 
-    public ArrayList<Location> getCanMoveLocs(Location loc)
-	    throws RemoteException;
+    public boolean movePawn(Location newLoc);
 
-    public boolean isCanPutWall(Location loc, int direction)
-	    throws RemoteException;
+    public void putWall(Location loc, int direction);
 
-    public boolean movePawn(Location newLoc) throws RemoteException;
+    public Player getPlayer(int playerIndex);
 
-    public void putWall(Location loc, int direction) throws RemoteException;
+    public int getNumPlayers();
 
-    public Player getPlayer(int playerIndex) throws RemoteException;
+    public String nextPlayer();
 
-    public int getNumPlayers() throws RemoteException;
+    public int getCurrPlayerIndex();
 
-    public String nextPlayer() throws RemoteException;
+    public void update(Graphics g, AbstractGameView context);
 
-    public AbstractView getUpdatingView() throws RemoteException;
-
-    public AbstractModel getUpdateDelegate() throws RemoteException;
-
-    public void requestWaitForUpdate() throws RemoteException;
-
-    public int getCurrPlayerIndex() throws RemoteException;
-
-    public void doneWithUpdateNotify(AbstractView context)
-	    throws RemoteException;
-
-    public void requestUpdate() throws RemoteException;
-
+    public void updateAllViews();
 }

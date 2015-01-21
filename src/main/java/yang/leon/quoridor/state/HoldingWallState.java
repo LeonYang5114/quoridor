@@ -10,10 +10,11 @@ import java.rmi.RemoteException;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import yang.leon.quoridor.AbstractView;
+import yang.leon.quoridor.AbstractGameView;
 import yang.leon.quoridor.DefaultModel;
 import yang.leon.quoridor.DefaultView;
 import yang.leon.quoridor.IModelAdapter;
+import yang.leon.quoridor.IRemoteModelAdapter;
 import yang.leon.quoridor.Location;
 
 public class HoldingWallState extends IViewState {
@@ -28,7 +29,7 @@ public class HoldingWallState extends IViewState {
     private Timer timer;
     private boolean showPuttingLoc;
 
-    public HoldingWallState(AbstractView context) {
+    public HoldingWallState(AbstractGameView context) {
 	super(context);
 	direction = DefaultModel.HORIZONTAL_WALL;
 	timer = new Timer(DELAY, new ActionListener() {
@@ -61,7 +62,7 @@ public class HoldingWallState extends IViewState {
 		adpt.putWall(loc, direction);
 		String name = "yang.leon.quoridor.state." + adpt.nextPlayer();
 		IViewState newState = (IViewState) Class.forName(name)
-			.getConstructor(AbstractView.class)
+			.getConstructor(AbstractGameView.class)
 			.newInstance(getContext());
 		getContext().setViewState(newState);
 	    }
@@ -83,15 +84,11 @@ public class HoldingWallState extends IViewState {
 	if (mouseLocation == null)
 	    return;
 	Location loc = DefaultView.getCrsLocAtPoint(mouseLocation);
-	try {
-	    if (showPuttingLoc
-		    && getContext().getModelAdapter().isCanPutWall(loc,
-			    direction)) {
-		Point putting = DefaultView.getPointFromCrsLoc(loc);
-		getContext().drawWall(g, putting, direction, "light");
-	    }
-	} catch (RemoteException e) {
-	    e.printStackTrace();
+	if (showPuttingLoc
+	    && getContext().getModelAdapter().isCanPutWall(loc,
+		    direction)) {
+	Point putting = DefaultView.getPointFromCrsLoc(loc);
+	getContext().drawWall(g, putting, direction, "light");
 	}
 	getContext().drawWall(g, mouseLocation, direction, null);
     }

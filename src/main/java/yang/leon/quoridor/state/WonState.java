@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.rmi.RemoteException;
 
-import yang.leon.quoridor.AbstractView;
+import yang.leon.quoridor.AbstractGameView;
 import yang.leon.quoridor.DefaultView;
 import yang.leon.quoridor.IModelAdapter;
 import yang.leon.quoridor.Location;
@@ -16,20 +16,15 @@ public class WonState extends WaitingState {
      */
     private static final long serialVersionUID = -8988859134229907152L;
 
-    public WonState(AbstractView context) {
+    public WonState(AbstractGameView context) {
 	super(context);
     }
 
     public void update(Graphics g) {
 	IModelAdapter adpt = getContext().getModelAdapter();
 	Location pawnLoc = null;
-	try {
-	    pawnLoc = adpt.getPlayer(adpt.getCurrPlayerIndex())
-	    	.getPawnLoc();
-	} catch (RemoteException e) {
-	    e.printStackTrace();
-	    return;
-	}
+	pawnLoc = adpt.getPlayer(adpt.getCurrPlayerIndex())
+		.getPawnLoc();
 	Point pawnPoint = DefaultView.getPointFromSqrLoc(pawnLoc);
 	g.drawImage(getContext().getImage("winner"), pawnPoint.x, pawnPoint.y,
 		null);

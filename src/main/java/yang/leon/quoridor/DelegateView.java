@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 
 import yang.leon.quoridor.state.IViewState;
 
-class DelegateView extends AbstractView {
+class DelegateView extends AbstractGameView {
     
     /**
      * 
@@ -63,6 +63,15 @@ class DelegateView extends AbstractView {
 
     @Override
     public void setViewState(IViewState aState) {	
+    }
+
+    @Override
+    public IModelAdapter getModelAdapter() {
+	return null;
+    }
+
+    @Override
+    public void setModelAdapter(IModelAdapter modelAdpt) {
     }
 
 }

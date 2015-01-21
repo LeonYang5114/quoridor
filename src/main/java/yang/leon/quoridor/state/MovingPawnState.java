@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
-import yang.leon.quoridor.AbstractView;
+import yang.leon.quoridor.AbstractGameView;
 import yang.leon.quoridor.DefaultView;
 import yang.leon.quoridor.IModelAdapter;
 import yang.leon.quoridor.Location;
@@ -20,7 +20,7 @@ public class MovingPawnState extends IViewState {
      */
     private static final long serialVersionUID = 1277736410447138262L;
 
-    public MovingPawnState(AbstractView context) {
+    public MovingPawnState(AbstractGameView context) {
 	super(context);
     }
 
@@ -35,26 +35,18 @@ public class MovingPawnState extends IViewState {
 	Location loc = DefaultView.getSqrLocAtPoint(e.getPoint());
 	IModelAdapter adpt = getContext().getModelAdapter();
 	ArrayList<Location> canMoveLocs = null;
-	try {
-	    canMoveLocs = adpt.getCanMoveLocs(adpt.getPlayer(
-		    adpt.getCurrPlayerIndex()).getPawnLoc());
-	} catch (RemoteException e1) {
-	    e1.printStackTrace();
-	}
+	canMoveLocs = adpt.getCanMoveLocs(adpt.getPlayer(
+		adpt.getCurrPlayerIndex()).getPawnLoc());
 	if (canMoveLocs == null || !canMoveLocs.contains(loc))
 	    return;
-	try {
-	    if (adpt.movePawn(loc)) {
-		getContext().win(adpt.getCurrPlayerIndex());
-		return;
-	    }
-	} catch (RemoteException e1) {
-	    e1.printStackTrace();
+	if (adpt.movePawn(loc)) {
+	    getContext().win(adpt.getCurrPlayerIndex());
+	    return;
 	}
 	try {
 	    String name = "yang.leon.quoridor.state." + adpt.nextPlayer();
 	    IViewState newState = (IViewState) Class.forName(name)
-		    .getConstructor(AbstractView.class)
+		    .getConstructor(AbstractGameView.class)
 		    .newInstance(getContext());
 	    getContext().setViewState(newState);
 	} catch (Exception e1) {
@@ -70,19 +62,9 @@ public class MovingPawnState extends IViewState {
     public void update(Graphics g) {
 	IModelAdapter adpt = getContext().getModelAdapter();
 	Location pawnLoc = null;
-	try {
-	    pawnLoc = adpt.getPlayer(adpt.getCurrPlayerIndex()).getPawnLoc();
-	} catch (RemoteException e) {
-	    e.printStackTrace();
-	    return;
-	}
+	pawnLoc = adpt.getPlayer(adpt.getCurrPlayerIndex()).getPawnLoc();
 	ArrayList<Location> canMoveLocs = null;
-	try {
-	    canMoveLocs = adpt.getCanMoveLocs(pawnLoc);
-	} catch (RemoteException e) {
-	    e.printStackTrace();
-	    return;
-	}
+	canMoveLocs = adpt.getCanMoveLocs(pawnLoc);
 	for (Location loc : canMoveLocs) {
 	    Point p = DefaultView.getPointFromSqrLoc(loc);
 	    g.drawImage(getContext().getImage("pawn.light"), p.x, p.y, null);
