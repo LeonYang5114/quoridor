@@ -11,10 +11,6 @@ public abstract class AbstractModeController {
     public abstract AbstractModeWizard getCurrModeWizard();
 
     public abstract void setModeWizard(String wizard);
-
-    public abstract void setGameController(AbstractGameController controller);
-    
-    public abstract AbstractGameController getGameController();
     
     public abstract void launch(AbstractLauncher launcher);
     

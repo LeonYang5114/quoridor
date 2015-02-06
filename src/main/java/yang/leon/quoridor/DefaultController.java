@@ -1,10 +1,10 @@
 package yang.leon.quoridor;
 
 import java.awt.Graphics;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 import yang.leon.quoridor.mode.AbstractModeController;
+import yang.leon.quoridor.state.InitialState;
 
 public class DefaultController extends AbstractGameController {
 
@@ -71,7 +71,8 @@ public class DefaultController extends AbstractGameController {
 
     @Override
     public String nextPlayer() {
-	return model.nextPlayer();
+	model.nextPlayer();
+	return "InitialState";
     }
 
     @Override
@@ -111,6 +112,7 @@ public class DefaultController extends AbstractGameController {
 	    getView().setModelAdapter(null);
 	view = ((gameView != null) ? gameView : new DefaultView());
 	getView().setModelAdapter(this);
+	getView().setViewState(new InitialState(getView()));
     }
 
     public AbstractGameView getView() {

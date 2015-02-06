@@ -61,8 +61,8 @@ public class ClientGameWizard extends AbstractModeWizard {
 	    public void actionPerformed(ActionEvent e) {
 		try {
 		    RemoteController controller = new RemoteController();
+		    controller.setModeController(getModeController());
 		    controller.registerView(new DefaultView());
-		    getModeController().setGameController(controller);
 		    String name = tf_hostName.getText();
 		    IRemoteViewAdapter client = (IRemoteViewAdapter) UnicastRemoteObject
 			    .exportObject(controller, 0);

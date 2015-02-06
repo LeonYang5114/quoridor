@@ -10,7 +10,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import yang.leon.quoridor.mode.AbstractModeController;
-import yang.leon.quoridor.mode.HostGameWizard;
 import yang.leon.quoridor.mode.ModeController;
 
 public class QuoridorMain extends JFrame {
@@ -23,6 +22,7 @@ public class QuoridorMain extends JFrame {
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	setJMenuBar(new QuoridorMenuBar());
 	controller = new ModeController(this);
+	setLocationRelativeTo(null);
     }
 
     public AbstractModeController getModeController() {

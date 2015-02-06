@@ -119,7 +119,8 @@ public class RemoteController extends DefaultController implements
 		e.printStackTrace();
 	    }
 	}
-	return super.nextPlayer();
+	super.nextPlayer();
+	return "WaitingState";
     }
 
     @Override
@@ -178,7 +179,6 @@ public class RemoteController extends DefaultController implements
 	    getModeController()
 		    .viewRegisterNotify(RemoteServer.getClientHost());
 	} catch (ServerNotActiveException e) {
-	    e.printStackTrace();
 	}
     }
 

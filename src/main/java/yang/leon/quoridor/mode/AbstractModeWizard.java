@@ -15,7 +15,6 @@ public abstract class AbstractModeWizard extends JPanel {
 	frame.setMinimumSize(null);
 	frame.setMinimumSize(getMinimumSize());
 	frame.pack();
-	frame.setLocationRelativeTo(null);
 	frame.setVisible(true);
 	frame.repaint();
     }

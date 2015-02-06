@@ -34,6 +34,8 @@ public class HostGameWizard extends AbstractModeWizard {
 
     private JButton btn_listen;
     private JButton btn_launch;
+    
+    private RemoteController serverController;
 
     public HostGameWizard() {
 	super();
@@ -62,13 +64,11 @@ public class HostGameWizard extends AbstractModeWizard {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		try {
-		    RemoteController controller = new RemoteController();
-		    AbstractGameView view = new DefaultView();
-		    controller.registerView(view);
-		    getModeController().setGameController(controller);
+		    serverController = new RemoteController();
+		    serverController.setModeController(getModeController());
 		    String name = tf_hostName.getText();
 		    IRemoteModelAdapter server = (IRemoteModelAdapter) UnicastRemoteObject
-			    .exportObject(controller, 0);
+			    .exportObject(serverController, 0);
 		    Registry registry = null;
 		    try {
 			registry = LocateRegistry.createRegistry(1099);
@@ -115,22 +115,14 @@ public class HostGameWizard extends AbstractModeWizard {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		final RemoteController controller = (RemoteController) getModeController()
-			.getGameController();
-		controller.registerModel(new DefaultModel(controller
-			.getRemoteViewAdapters().size() + 1));
-		AbstractLauncher launcher = new AbstractLauncher() {
-		    @Override
-		    public void launch(JFrame frame) {
-			frame.getContentPane().removeAll();
-			controller.launchNotify();
-			frame.getContentPane().add(controller.getView());
-			frame.setPreferredSize(null);
-			frame.pack();
-			frame.setLocationRelativeTo(null);
-		    }
-		};
-		getModeController().launch(launcher);
+		serverController.registerModel(new DefaultModel(
+			serverController.getRemoteViewAdapters().size()));
+		RemoteController localController = new RemoteController();
+		localController.setModeController(getModeController());
+		AbstractGameView view = new DefaultView();
+		localController.registerView(view);
+		serverController.registerRemoteViewAdapter(localController);
+		serverController.launchNotify();
 	    }
 	});
 	c.gridx = 0;

@@ -31,7 +31,7 @@ public abstract class AbstractGameModel implements Serializable {
 
     public abstract int getNumPlayers();
 
-    public abstract String nextPlayer();
+    public abstract void nextPlayer();
 
     public abstract int getCurrPlayerIndex();
 

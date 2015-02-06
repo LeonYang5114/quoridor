@@ -72,18 +72,4 @@ public abstract class AbstractGameView extends JPanel implements Serializable {
     public abstract void win(int currPlayerIndex);
 
     public abstract void disableButtons();
-
-    public boolean equals(Object obj) {
-	if (obj == null || !(obj instanceof AbstractGameView))
-	    return false;
-	AbstractGameView view = (AbstractGameView) obj;
-
-	if (getViewState() != null) {
-	    if (!getViewState().equals(view.getViewState()))
-		return false;
-	} else if (view.getViewState() != null)
-	    return false;
-
-	return true;
-    }
 }

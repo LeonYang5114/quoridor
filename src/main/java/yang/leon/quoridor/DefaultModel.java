@@ -221,11 +221,10 @@ public class DefaultModel extends AbstractGameModel {
 	return players.length;
     }
 
-    public String nextPlayer() {
+    public void nextPlayer() {
 	currPlayerIndex++;
 	currPlayerIndex %= players.length;
 	setUpdateDelegate(createUpdateDelegate());
-	return "InitialState";
     }
 
     public int getCurrPlayerIndex() {

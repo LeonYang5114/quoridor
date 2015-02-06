@@ -25,8 +25,8 @@ import javax.swing.JPanel;
 
 import yang.leon.quoridor.state.HoldingWallState;
 import yang.leon.quoridor.state.IViewState;
-import yang.leon.quoridor.state.InitialState;
 import yang.leon.quoridor.state.MovingPawnState;
+import yang.leon.quoridor.state.WaitingState;
 import yang.leon.quoridor.state.WonState;
 
 public class DefaultView extends AbstractGameView {
@@ -206,7 +206,7 @@ public class DefaultView extends AbstractGameView {
 	add(pnl_grid, BorderLayout.CENTER);
 	add(pnl_func, BorderLayout.SOUTH);
 	setPreferredSize(getPreferredSize());
-	setViewState(new InitialState(this));
+	setViewState(new WaitingState(this));
 	isResettingGUI = false;
     }
 

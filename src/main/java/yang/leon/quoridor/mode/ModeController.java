@@ -1,20 +1,14 @@
 package yang.leon.quoridor.mode;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import javax.swing.JFrame;
-
-import yang.leon.quoridor.AbstractGameController;
-import yang.leon.quoridor.AbstractGameView;
-import yang.leon.quoridor.state.IViewState;
 
 public class ModeController extends AbstractModeController {
 
     private JFrame frame;
     private HashMap<String, AbstractModeWizard> modeWizards;
     private AbstractModeWizard modeWizard;
-    private AbstractGameController gameController;
 
     public ModeController(JFrame frame) {
 	this.frame = frame;
@@ -49,17 +43,6 @@ public class ModeController extends AbstractModeController {
 	    modeWizard.setModeController(this);
 	}
 	getCurrModeWizard().showWizard(getFrame());
-    }
-
-    @Override
-    public void setGameController(AbstractGameController controller) {
-	gameController = controller;
-	gameController.setModeController(this);
-    }
-
-    @Override
-    public AbstractGameController getGameController() {
-	return gameController;
     }
 
     @Override

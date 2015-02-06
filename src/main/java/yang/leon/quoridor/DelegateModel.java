@@ -40,8 +40,7 @@ class DelegateModel extends AbstractGameModel {
     }
 
     @Override
-    public String nextPlayer() {
-	return null;
+    public void nextPlayer() {
     }
 
     @Override
