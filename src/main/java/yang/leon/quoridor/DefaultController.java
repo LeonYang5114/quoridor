@@ -4,6 +4,8 @@ import java.awt.Graphics;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
+import yang.leon.quoridor.mode.AbstractModeController;
+
 public class DefaultController extends AbstractGameController {
 
     private AbstractGameView view;

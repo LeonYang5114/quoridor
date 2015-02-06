@@ -1,4 +1,4 @@
-package yang.leon.quoridor;
+package yang.leon.quoridor.mode;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -19,6 +19,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import yang.leon.quoridor.AbstractGameView;
+import yang.leon.quoridor.DefaultModel;
+import yang.leon.quoridor.DefaultView;
+import yang.leon.quoridor.IRemoteModelAdapter;
+import yang.leon.quoridor.RemoteController;
+
 public class HostGameWizard extends AbstractModeWizard {
 
     private AbstractModeController controller;
@@ -33,7 +39,7 @@ public class HostGameWizard extends AbstractModeWizard {
 	super();
 	System.out.println("host game wizard");
 	setLayout(new GridBagLayout());
-	setPreferredSize(new Dimension(300, 300));
+	setMinimumSize(new Dimension(300, 250));
 
 	GridBagConstraints c = new GridBagConstraints();
 	c.gridx = 0;

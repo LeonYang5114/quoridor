@@ -1,6 +1,8 @@
-package yang.leon.quoridor;
+package yang.leon.quoridor.mode;
 
 import javax.swing.JFrame;
+
+import yang.leon.quoridor.AbstractGameController;
 
 public abstract class AbstractModeController {
     
@@ -8,9 +10,7 @@ public abstract class AbstractModeController {
 
     public abstract AbstractModeWizard getCurrModeWizard();
 
-    public abstract void setModeWizard(AbstractModeWizard wizard);
-    
-    public abstract void showWizard();
+    public abstract void setModeWizard(String wizard);
 
     public abstract void setGameController(AbstractGameController controller);
     

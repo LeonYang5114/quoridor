@@ -1,4 +1,4 @@
-package yang.leon.quoridor;
+package yang.leon.quoridor.mode;
 
 import javax.swing.JFrame;
 

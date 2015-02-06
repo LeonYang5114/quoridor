@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
+import yang.leon.quoridor.mode.AbstractLauncher;
+
 public class RemoteController extends DefaultController implements
 	IRemoteViewAdapter, IRemoteModelAdapter {
 

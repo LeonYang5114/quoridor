@@ -1,16 +1,25 @@
-package yang.leon.quoridor;
+package yang.leon.quoridor.mode;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 
 import javax.swing.JFrame;
+
+import yang.leon.quoridor.AbstractGameController;
+import yang.leon.quoridor.AbstractGameView;
+import yang.leon.quoridor.state.IViewState;
 
 public class ModeController extends AbstractModeController {
 
     private JFrame frame;
+    private HashMap<String, AbstractModeWizard> modeWizards;
     private AbstractModeWizard modeWizard;
     private AbstractGameController gameController;
 
     public ModeController(JFrame frame) {
 	this.frame = frame;
-	setModeWizard(new LocalGameWizard());
+	modeWizards = new HashMap<String, AbstractModeWizard>();
+	setModeWizard("LocalGameWizard");
     }
 
     @Override
@@ -24,12 +33,21 @@ public class ModeController extends AbstractModeController {
     }
 
     @Override
-    public void setModeWizard(AbstractModeWizard wizard) {
-	modeWizard = wizard;
-	modeWizard.setModeController(this);
-    }
-    
-    public void showWizard() {
+    public void setModeWizard(String wizard) {
+	if (modeWizards.get(wizard) != null) {
+	    modeWizard = modeWizards.get(wizard);
+	} else {
+	    String name = "yang.leon.quoridor.mode." + wizard;
+	    try {
+		modeWizard = (AbstractModeWizard) Class.forName(name)
+			.getConstructor().newInstance();
+	    } catch (Exception e) {
+		e.printStackTrace();
+		return;
+	    }
+	    modeWizards.put(wizard, modeWizard);
+	    modeWizard.setModeController(this);
+	}
 	getCurrModeWizard().showWizard(getFrame());
     }
 
@@ -38,7 +56,7 @@ public class ModeController extends AbstractModeController {
 	gameController = controller;
 	gameController.setModeController(this);
     }
-    
+
     @Override
     public AbstractGameController getGameController() {
 	return gameController;
@@ -55,11 +73,11 @@ public class ModeController extends AbstractModeController {
 	    ((HostGameWizard) modeWizard).clientAdded(clientName);
 	}
     }
-    
+
     @Override
     public void modelRegisterNotify(String serverName) {
-	if (modeWizard instanceof FindGameWizard) {
-	    ((FindGameWizard) modeWizard).serverConnected(serverName);
+	if (modeWizard instanceof ClientGameWizard) {
+	    ((ClientGameWizard) modeWizard).serverConnected(serverName);
 	}
     }
 

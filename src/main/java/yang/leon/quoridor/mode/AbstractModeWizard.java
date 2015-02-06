@@ -1,4 +1,4 @@
-package yang.leon.quoridor;
+package yang.leon.quoridor.mode;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -12,10 +12,12 @@ public abstract class AbstractModeWizard extends JPanel {
     public void showWizard(JFrame frame) {
 	frame.getContentPane().removeAll();
 	frame.getContentPane().add(this);
-	frame.setPreferredSize(null);
+	frame.setMinimumSize(null);
+	frame.setMinimumSize(getMinimumSize());
 	frame.pack();
 	frame.setLocationRelativeTo(null);
 	frame.setVisible(true);
+	frame.repaint();
     }
 
 }

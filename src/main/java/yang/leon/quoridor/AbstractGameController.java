@@ -1,5 +1,7 @@
 package yang.leon.quoridor;
 
+import yang.leon.quoridor.mode.AbstractModeController;
+
 public abstract class AbstractGameController implements IModelAdapter,
 	IViewAdapter {
 

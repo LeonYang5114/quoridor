@@ -1,4 +1,4 @@
-package yang.leon.quoridor;
+package yang.leon.quoridor.mode;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -19,7 +19,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class FindGameWizard extends AbstractModeWizard {
+import yang.leon.quoridor.DefaultView;
+import yang.leon.quoridor.IRemoteModelAdapter;
+import yang.leon.quoridor.IRemoteViewAdapter;
+import yang.leon.quoridor.RemoteController;
+
+public class ClientGameWizard extends AbstractModeWizard {
 
     private AbstractModeController controller;
 
@@ -28,11 +33,11 @@ public class FindGameWizard extends AbstractModeWizard {
 
     private JButton btn_find;
 
-    public FindGameWizard() {
+    public ClientGameWizard() {
 	super();
-	System.out.println("find game wizard");
+	System.out.println("client game wizard");
 	setLayout(new GridBagLayout());
-	setPreferredSize(new Dimension(300, 300));
+	setMinimumSize(new Dimension(300, 250));
 
 	GridBagConstraints c = new GridBagConstraints();
 	c.gridx = 0;
