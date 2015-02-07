@@ -19,7 +19,7 @@ public interface IModelAdapter {
 
     public int getNumPlayers();
 
-    public String nextPlayer();
+    public void nextPlayer();
 
     public int getCurrPlayerIndex();
 

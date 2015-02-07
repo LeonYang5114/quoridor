@@ -62,7 +62,7 @@ class DelegateView extends AbstractGameView {
     }
 
     @Override
-    public void setViewState(IViewState aState) {	
+    public void setViewState(String stateName) {	
     }
 
     @Override

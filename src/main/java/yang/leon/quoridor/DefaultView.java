@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -114,8 +115,14 @@ public class DefaultView extends AbstractGameView {
 	return viewState;
     }
 
-    public void setViewState(IViewState aState) {
-	this.viewState = aState;
+    public void setViewState(String stateName) {
+	String name = "yang.leon.quoridor.state." + stateName;
+	try {
+	    this.viewState = (IViewState) Class.forName(name)
+	    	.getConstructor(AbstractGameView.class).newInstance(this);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
 	getModelAdapter().updateAllViews();
     }
 
@@ -166,7 +173,7 @@ public class DefaultView extends AbstractGameView {
 	    public void actionPerformed(ActionEvent e) {
 		if (getViewState() instanceof HoldingWallState)
 		    return;
-		setViewState(new HoldingWallState(DefaultView.this));
+		setViewState("HoldingWallState");
 	    }
 	});
 
@@ -180,7 +187,7 @@ public class DefaultView extends AbstractGameView {
 	    public void actionPerformed(ActionEvent e) {
 		if (getViewState() instanceof MovingPawnState)
 		    return;
-		setViewState(new MovingPawnState(DefaultView.this));
+		setViewState("MovingPawnState");
 		update();
 	    }
 	});
@@ -206,7 +213,7 @@ public class DefaultView extends AbstractGameView {
 	add(pnl_grid, BorderLayout.CENTER);
 	add(pnl_func, BorderLayout.SOUTH);
 	setPreferredSize(getPreferredSize());
-	setViewState(new WaitingState(this));
+	setViewState("WaitingState");
 	isResettingGUI = false;
     }
 
@@ -260,7 +267,7 @@ public class DefaultView extends AbstractGameView {
     }
 
     public void win(int currPlayerIndex) {
-	setViewState(new WonState(this));
+	setViewState("WonState");
 	JOptionPane.showMessageDialog(this, "Congratulations! Player "
 		+ currPlayerIndex + " is the winner!");
     }

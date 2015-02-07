@@ -27,7 +27,7 @@ public class MovingPawnState extends IViewState {
     @Override
     public void mousePressed(MouseEvent e) {
 	if (SwingUtilities.isRightMouseButton(e)) {
-	    getContext().setViewState(new InitialState(getContext()));
+	    getContext().setViewState("InitialState");
 	    return;
 	}
 	if (!SwingUtilities.isLeftMouseButton(e))
@@ -43,15 +43,7 @@ public class MovingPawnState extends IViewState {
 	    getContext().win(adpt.getCurrPlayerIndex());
 	    return;
 	}
-	try {
-	    String name = "yang.leon.quoridor.state." + adpt.nextPlayer();
-	    IViewState newState = (IViewState) Class.forName(name)
-		    .getConstructor(AbstractGameView.class)
-		    .newInstance(getContext());
-	    getContext().setViewState(newState);
-	} catch (Exception e1) {
-	    e1.printStackTrace();
-	}
+	adpt.nextPlayer();
     }
 
     @Override

@@ -23,7 +23,7 @@ public interface IRemoteModelAdapter extends Remote {
 
     public int getNumPlayers() throws RemoteException;
 
-    public String nextPlayer() throws RemoteException;
+    public void nextPlayer() throws RemoteException;
 
     public int getCurrPlayerIndex() throws RemoteException;
 

@@ -40,6 +40,11 @@ public class DefaultController extends AbstractGameController {
     }
 
     @Override
+    public void setViewState(String stateName) {
+	getView().setViewState(stateName);
+    }
+
+    @Override
     public ArrayList<Location> getCanMoveLocs(Location loc) {
 	return model.getCanMoveLocs(loc);
     }
@@ -70,9 +75,10 @@ public class DefaultController extends AbstractGameController {
     }
 
     @Override
-    public String nextPlayer() {
-	model.nextPlayer();
-	return "InitialState";
+    public void nextPlayer() {
+	getModel().nextPlayer();
+	if (getView() != null)
+	    getView().setViewState("InitialState");
     }
 
     @Override
@@ -102,6 +108,8 @@ public class DefaultController extends AbstractGameController {
 	model = gameModel;
 	if (model != null) {
 	    model.setViewAdapter(this);
+	    if (getView() != null)
+		getView().setViewState("InitialState");
 	    update();
 	}
     }
@@ -112,13 +120,12 @@ public class DefaultController extends AbstractGameController {
 	    getView().setModelAdapter(null);
 	view = ((gameView != null) ? gameView : new DefaultView());
 	getView().setModelAdapter(this);
-	getView().setViewState(new InitialState(getView()));
     }
 
     public AbstractGameView getView() {
 	return view;
     }
-    
+
     public AbstractGameModel getModel() {
 	return model;
     }

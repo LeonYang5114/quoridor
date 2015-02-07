@@ -55,7 +55,7 @@ public abstract class AbstractGameView extends JPanel implements Serializable {
 
     public abstract IViewState getViewState();
 
-    public abstract void setViewState(IViewState aState);
+    public abstract void setViewState(String stateName);
 
     public abstract void resetGUI();
 

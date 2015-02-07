@@ -115,13 +115,18 @@ public class HostGameWizard extends AbstractModeWizard {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		serverController.registerModel(new DefaultModel(
-			serverController.getRemoteViewAdapters().size()));
+		
 		RemoteController localController = new RemoteController();
 		localController.setModeController(getModeController());
 		AbstractGameView view = new DefaultView();
 		localController.registerView(view);
+		
 		serverController.registerRemoteViewAdapter(localController);
+		localController.registerRemoteModelAdapter(serverController);
+		
+		serverController.registerModel(new DefaultModel(
+			serverController.getRemoteViewAdapters().size()));
+		
 		serverController.launchNotify();
 	    }
 	});

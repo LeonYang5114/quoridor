@@ -28,7 +28,7 @@ public class InitialState extends IViewState {
 	Location loc = AbstractGameView.getSqrLocAtPoint(e.getPoint());
 	IModelAdapter adpt = getContext().getModelAdapter();
 	if (adpt.getPlayer(adpt.getCurrPlayerIndex()).getPawnLoc().equals(loc)) {
-	    getContext().setViewState(new MovingPawnState(getContext()));
+	    getContext().setViewState("MovingPawnState");
 	}
     }
 

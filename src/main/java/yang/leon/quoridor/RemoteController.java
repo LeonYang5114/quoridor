@@ -5,10 +5,12 @@ import java.rmi.RemoteException;
 import java.rmi.server.RemoteServer;
 import java.rmi.server.ServerNotActiveException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.JFrame;
 
 import yang.leon.quoridor.mode.AbstractLauncher;
+import yang.leon.quoridor.state.InitialState;
 
 public class RemoteController extends DefaultController implements
 	IRemoteViewAdapter, IRemoteModelAdapter {
@@ -111,16 +113,25 @@ public class RemoteController extends DefaultController implements
     }
 
     @Override
-    public String nextPlayer() {
+    public void nextPlayer() {
 	if (remoteModelAdpt != null) {
 	    try {
-		return remoteModelAdpt.nextPlayer();
+		remoteModelAdpt.nextPlayer();
+		return;
+	    } catch (RemoteException e) {
+		e.printStackTrace();
+	    }
+	} else {
+	    try {
+		getRemoteViewAdapters().get(getCurrPlayerIndex()).setViewState(
+			"WaitingState");
+		super.nextPlayer();
+		getRemoteViewAdapters().get(getCurrPlayerIndex()).setViewState(
+			"InitialState");
 	    } catch (RemoteException e) {
 		e.printStackTrace();
 	    }
 	}
-	super.nextPlayer();
-	return "WaitingState";
     }
 
     @Override
@@ -179,6 +190,7 @@ public class RemoteController extends DefaultController implements
 	    getModeController()
 		    .viewRegisterNotify(RemoteServer.getClientHost());
 	} catch (ServerNotActiveException e) {
+	    getModeController().viewRegisterNotify("Local");
 	}
     }
 
@@ -188,21 +200,27 @@ public class RemoteController extends DefaultController implements
 	    getModeController().modelRegisterNotify(
 		    RemoteServer.getClientHost());
 	} catch (ServerNotActiveException e) {
-	    e.printStackTrace();
+	    getModeController().modelRegisterNotify("Local");
 	}
     }
 
     public void launchNotify() {
-	for (IRemoteViewAdapter viewAdpt : remoteViewAdpts) {
+	Collections.shuffle(getRemoteViewAdapters());
+	boolean isFirst = true;
+	for (IRemoteViewAdapter viewAdpt : getRemoteViewAdapters()) {
 	    try {
-		viewAdpt.launch();
+		viewAdpt.launch(isFirst);
 	    } catch (RemoteException e) {
 		e.printStackTrace();
 	    }
+	    isFirst = false;
 	}
     }
 
-    public void launch() {
+    public void launch(boolean isFirst) {
+	if (isFirst) {
+	    getView().setViewState("InitialState");
+	}
 	getModeController().launch(new AbstractLauncher() {
 	    @Override
 	    public void launch(JFrame frame) {
