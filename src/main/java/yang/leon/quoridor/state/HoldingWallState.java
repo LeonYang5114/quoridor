@@ -58,6 +58,7 @@ public class HoldingWallState extends IViewState {
 	Location loc = DefaultView.getCrsLocAtPoint(e.getPoint());
 	IModelAdapter adpt = getContext().getModelAdapter();
 	if (adpt.isCanPutWall(loc, direction)) {
+	    adpt.putWall(loc, direction);
 	    adpt.nextPlayer();
 	}
     }

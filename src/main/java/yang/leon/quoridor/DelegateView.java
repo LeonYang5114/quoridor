@@ -9,13 +9,13 @@ import javax.swing.JPanel;
 import yang.leon.quoridor.state.IViewState;
 
 class DelegateView extends AbstractGameView {
-    
+
     /**
      * 
      */
     private static final long serialVersionUID = -3485230108525274330L;
 
-    public DelegateView() {	
+    public DelegateView() {
     }
 
     @Override
@@ -57,12 +57,16 @@ class DelegateView extends AbstractGameView {
     }
 
     @Override
+    public void enableButtons() {
+    }
+
+    @Override
     public IViewState getViewState() {
 	return null;
     }
 
     @Override
-    public void setViewState(String stateName) {	
+    public void setViewState(String stateName) {
     }
 
     @Override

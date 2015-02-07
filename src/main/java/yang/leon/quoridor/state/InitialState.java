@@ -19,6 +19,7 @@ public class InitialState extends IViewState {
 
     public InitialState(AbstractGameView context) {
 	super(context);
+	getContext().enableButtons();
     }
 
     @Override

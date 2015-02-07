@@ -276,4 +276,9 @@ public class DefaultView extends AbstractGameView {
 	btn_wall.setEnabled(false);
 	btn_pawn.setEnabled(false);
     }
+    
+    public void enableButtons() {
+	btn_wall.setEnabled(true);
+	btn_pawn.setEnabled(true);
+    }
 }

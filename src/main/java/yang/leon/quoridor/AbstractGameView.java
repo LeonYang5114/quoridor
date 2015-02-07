@@ -72,4 +72,6 @@ public abstract class AbstractGameView extends JPanel implements Serializable {
     public abstract void win(int currPlayerIndex);
 
     public abstract void disableButtons();
+    
+    public abstract void enableButtons();
 }
