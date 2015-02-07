@@ -64,7 +64,7 @@ public class QuoridorMain extends JFrame {
     }
 
     public static void main(String[] args) {
-	QuoridorMain main = new QuoridorMain();
+	new QuoridorMain();
     }
 
 }

@@ -6,14 +6,19 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -34,7 +39,7 @@ public class HostGameWizard extends AbstractModeWizard {
 
     private JButton btn_listen;
     private JButton btn_launch;
-    
+
     private RemoteController serverController;
 
     public HostGameWizard() {
@@ -46,7 +51,6 @@ public class HostGameWizard extends AbstractModeWizard {
 	GridBagConstraints c = new GridBagConstraints();
 	c.gridx = 0;
 	c.gridy = 0;
-	c.weightx = 0.2;
 	c.insets = new Insets(10, 5, 5, 5);
 	c.weighty = 0.2;
 	add(new JLabel("Host Name: "), c);
@@ -54,7 +58,7 @@ public class HostGameWizard extends AbstractModeWizard {
 	tf_hostName = new JTextField();
 	c.gridx = 1;
 	c.gridy = 0;
-	c.weightx = 0.5;
+	c.weightx = 1;
 	c.fill = GridBagConstraints.HORIZONTAL;
 	add(tf_hostName, c);
 
@@ -79,6 +83,9 @@ public class HostGameWizard extends AbstractModeWizard {
 			registry.lookup(name);
 		    } catch (NotBoundException e2) {
 			registry.rebind(name, server);
+			listenForUDP(name);
+			ta_hostLog.append("Server: "
+				+ InetAddress.getLocalHost() + "\n");
 			ta_hostLog.append("Start listening...\n");
 			btn_listen.setEnabled(false);
 			return;
@@ -93,17 +100,19 @@ public class HostGameWizard extends AbstractModeWizard {
 	});
 	c.gridx = 2;
 	c.gridy = 0;
-	c.weightx = 0.3;
+	c.weightx = 0;
 	c.fill = GridBagConstraints.NONE;
 	add(btn_listen, c);
 
-	ta_hostLog = new JTextArea();
+	ta_hostLog = new JTextArea(10, 20);
+	ta_hostLog.setLineWrap(true);
 	JScrollPane sp_hostLog = new JScrollPane(ta_hostLog);
 	sp_hostLog
 		.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	c.gridx = 0;
 	c.gridy = 1;
 	c.gridwidth = 3;
+	c.weightx = 1;
 	c.insets = new Insets(5, 5, 5, 5);
 	c.fill = GridBagConstraints.BOTH;
 	c.weighty = 0.6;
@@ -115,18 +124,18 @@ public class HostGameWizard extends AbstractModeWizard {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		
+
 		RemoteController localController = new RemoteController();
 		localController.setModeController(getModeController());
 		AbstractGameView view = new DefaultView();
 		localController.registerView(view);
-		
+
 		serverController.registerRemoteViewAdapter(localController);
 		localController.registerRemoteModelAdapter(serverController);
-		
+
 		serverController.registerModel(new DefaultModel(
 			serverController.getRemoteViewAdapters().size()));
-		
+
 		serverController.launchNotify();
 	    }
 	});
@@ -139,6 +148,56 @@ public class HostGameWizard extends AbstractModeWizard {
 	add(btn_launch, c);
 	btn_launch.setEnabled(false);
 
+    }
+
+    private void listenForUDP(final String serverName) {
+	Thread listen = new Thread() {
+	    // This segment of code comes from Michiel De Mey
+	    // http://michieldemey.be/blog/network-discovery-using-udp-broadcast/
+	    public void run() {
+		DatagramSocket socket;
+		try {
+		    socket = new DatagramSocket(8888,
+			    InetAddress.getByName("0.0.0.0"));
+		    socket.setBroadcast(true);
+
+		    while (true) {
+			byte[] recvBuf = new byte[15000];
+			DatagramPacket packet = new DatagramPacket(recvBuf,
+				recvBuf.length);
+			socket.receive(packet);
+
+			// Packet received
+			System.out.println(getClass().getName()
+				+ ">>>Discovery packet received from: "
+				+ packet.getAddress().getHostAddress());
+			System.out.println(getClass().getName()
+				+ ">>>Packet received; data: "
+				+ new String(packet.getData()));
+
+			// See if the packet holds the right command (message)
+			String message = new String(packet.getData()).trim();
+			if (message.equals("DISCOVER_QUORIDOR_SERVER_REQUEST")) {
+			    byte[] sendData = ("QUORIDOR_SERVER_NAME=<"
+				    + serverName + ">").getBytes();
+
+			    // Send a response
+			    DatagramPacket sendPacket = new DatagramPacket(
+				    sendData, sendData.length,
+				    packet.getAddress(), packet.getPort());
+			    socket.send(sendPacket);
+
+			    System.out.println(getClass().getName()
+				    + ">>>Sent packet to: "
+				    + sendPacket.getAddress().getHostAddress());
+			}
+		    }
+		} catch (IOException ex) {
+		    ex.printStackTrace();
+		}
+	    }
+	};
+	listen.start();
     }
 
     public void setModeController(AbstractModeController controller) {
