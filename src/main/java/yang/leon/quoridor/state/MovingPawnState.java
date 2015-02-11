@@ -22,12 +22,14 @@ public class MovingPawnState extends IViewState {
 
     public MovingPawnState(AbstractGameView context) {
 	super(context);
+	getContext().update();
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
 	if (SwingUtilities.isRightMouseButton(e)) {
 	    getContext().setViewState("InitialState");
+	    getContext().update();
 	    return;
 	}
 	if (!SwingUtilities.isLeftMouseButton(e))

@@ -104,6 +104,7 @@ public class ClientGameWizard extends AbstractModeWizard {
 
 		JList<String> serverList = new JList<String>(serversInfo
 			.toArray(new String[serversInfo.size()]));
+		serverList.setSelectedIndex(0);
 		int result = JOptionPane
 			.showConfirmDialog(ClientGameWizard.this, serverList,
 				"Select a server",

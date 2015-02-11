@@ -103,6 +103,7 @@ public class DefaultController extends AbstractGameController {
 	getModel().nextPlayer();
 	if (getView() != null)
 	    getView().setViewState("InitialState");
+	updateAllViews();
     }
 
     @Override

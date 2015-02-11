@@ -29,8 +29,8 @@ public abstract class AbstractGameModel implements Serializable {
     public static final int HORIZONTAL_WALL = 1, VERTICAL_WALL = 2;
 
     /**
-     * Gets the {@link IViewAdapter IViewAdapter} of this model, which
-     * provides methods to control the game view indirectly.
+     * Gets the {@link IViewAdapter IViewAdapter} of this model, which provides
+     * methods to control the game view indirectly.
      * 
      * @return the view adapter
      */
@@ -46,8 +46,8 @@ public abstract class AbstractGameModel implements Serializable {
     public abstract void setViewAdapter(IViewAdapter viewAdpt);
 
     /**
-     * Gets the current update delegate of this model. An update delegate is
-     * an <code>AbstractGameModel</code> with only information for updating the
+     * Gets the current update delegate of this model. An update delegate is an
+     * <code>AbstractGameModel</code> with only information for updating the
      * game view.
      * 
      * @return the current update delegate
@@ -57,7 +57,8 @@ public abstract class AbstractGameModel implements Serializable {
     /**
      * Sets the current update delegate as the given <code>updateDelegate</code>
      * . An update delegate is an <code>AbstractGameModel</code> with only
-     * information for updating the game view.
+     * information for updating the game view. This method is called every time
+     * the game state has changed so that the game view needs update.
      * 
      * @param updateDelegate
      *            the update delegate to be set
@@ -65,8 +66,12 @@ public abstract class AbstractGameModel implements Serializable {
     public abstract void setUpdateDelegate(AbstractGameModel updateDelegate);
 
     /**
-     * Gets an <code>ArrayList</code> of the {@link Location Location}s that
-     * a pawn on the given <code>Location</code> can move to.
+     * Gets an <code>ArrayList</code> of the {@link Location Location}s that a
+     * pawn on the given <code>Location</code> can move to.
+     * <p>
+     * The <code>Location</code>s that a pawn can move to is the union of all
+     * the adjacent <code>Location</code>s not blocked by any wall and
+     * <code>Location</code>s that any adjacent pawn can move to.
      * 
      * @param loc
      *            the <code>Location</code> of a pawn
@@ -75,11 +80,17 @@ public abstract class AbstractGameModel implements Serializable {
     public abstract ArrayList<Location> getCanMoveLocs(Location loc);
 
     /**
-     * Gets whether a wall with given <code>direction</code> can be put on
-     * the given {@link Location Location}.
+     * Gets whether a wall with given <code>direction</code> can be put on the
+     * given {@link Location Location}.
+     * <p>
+     * If the given <code>Location</code> already has a wall, <code>false</code>
+     * is returned. If any pawn is totally blocked (cannot reach its goal edge)
+     * by this wall, <code>false</code> is returned.
      * 
-     * @param loc the <code>Location</code> to be check
-     * @param direction the direction of the wall
+     * @param loc
+     *            the <code>Location</code> to be check
+     * @param direction
+     *            the direction of the wall
      * @return <code>true</code> if a specific wall can be put
      * @see #VERTICAL_WALL
      * @see #HORIZONTAL_WALL
