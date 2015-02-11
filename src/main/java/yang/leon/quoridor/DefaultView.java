@@ -266,10 +266,10 @@ public class DefaultView extends AbstractGameView {
 	g.drawImage(getImage("pawn"), p.x, p.y, null);
     }
 
-    public void win(int currPlayerIndex) {
+    public void win(int winnerIndex) {
 	setViewState("WonState");
 	JOptionPane.showMessageDialog(this, "Congratulations! Player "
-		+ currPlayerIndex + " is the winner!");
+		+ winnerIndex + " is the winner!");
     }
 
     public void disableButtons() {

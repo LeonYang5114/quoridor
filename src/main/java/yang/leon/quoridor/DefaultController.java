@@ -4,8 +4,13 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 
 import yang.leon.quoridor.mode.AbstractModeController;
-import yang.leon.quoridor.state.InitialState;
 
+/**
+ * Default implementation of the <code>AbstractGameController</code>.
+ * 
+ * @author Leon Yang
+ *
+ */
 public class DefaultController extends AbstractGameController {
 
     private AbstractGameView view;
@@ -13,22 +18,41 @@ public class DefaultController extends AbstractGameController {
 
     private AbstractModeController modeController;
 
+    /**
+     * Constructs a <code>DefaultController</code> with no game view or model.
+     */
     public DefaultController() {
 	this(null);
     }
 
+    /**
+     * Constructs a <code>DefaultController</code> with a game model with the
+     * given number of players.
+     * 
+     * @param numPlayers
+     *            the number of players in the game
+     */
     public DefaultController(int numPlayers) {
 	this(new DefaultModel(numPlayers));
     }
 
+    /**
+     * Constructs a <code>DefaultController</code> with a specific game model.
+     * The game controller of the model is set to be this controller.
+     * 
+     * @param gameModel
+     *            the game model used to construct this controller
+     */
     public DefaultController(AbstractGameModel gameModel) {
 	registerModel(gameModel);
     }
 
+    @Override
     public void setModeController(AbstractModeController controller) {
 	modeController = controller;
     }
 
+    @Override
     public AbstractModeController getModeController() {
 	return modeController;
     }
@@ -122,10 +146,12 @@ public class DefaultController extends AbstractGameController {
 	getView().setModelAdapter(this);
     }
 
+    @Override
     public AbstractGameView getView() {
 	return view;
     }
 
+    @Override
     public AbstractGameModel getModel() {
 	return model;
     }

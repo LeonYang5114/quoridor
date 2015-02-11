@@ -17,9 +17,6 @@ public class DefaultModel extends AbstractGameModel {
     public static final int NOT_ON_EDGE = -1, NORTH_EDGE = 0, EAST_EDGE = 1,
 	    SOUTH_EDGE = 2, WEST_EDGE = 3;
 
-    public static final int NO_WALL = 0, HORIZONTAL_WALL = 1,
-	    VERTICAL_WALL = 2;
-
     public static final int TOTAL_WALLS = 20;
 
     private transient IViewAdapter viewAdpt;

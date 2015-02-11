@@ -5,6 +5,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
+
 public interface IRemoteModelAdapter extends Remote {
 
     public AbstractGameModel getUpdateDelegate() throws RemoteException;
@@ -28,8 +29,8 @@ public interface IRemoteModelAdapter extends Remote {
     public int getCurrPlayerIndex() throws RemoteException;
 
     public void update(Graphics g, AbstractGameView context)
-	    throws RemoteException;    
-    
+	    throws RemoteException;
+
     public void updateAllViews() throws RemoteException;
 
     public void registerRemoteViewAdapter(IRemoteViewAdapter remoteViewAdpt)

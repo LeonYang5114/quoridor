@@ -49,7 +49,7 @@ class DelegateView extends AbstractGameView {
     }
 
     @Override
-    public void win(int currPlayerIndex) {
+    public void win(int winnerIndex) {
     }
 
     @Override
