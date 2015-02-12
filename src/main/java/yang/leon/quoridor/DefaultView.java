@@ -25,7 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import yang.leon.quoridor.state.HoldingWallState;
-import yang.leon.quoridor.state.IViewState;
+import yang.leon.quoridor.state.AbstractViewState;
 import yang.leon.quoridor.state.MovingPawnState;
 import yang.leon.quoridor.state.WaitingState;
 import yang.leon.quoridor.state.WonState;
@@ -79,7 +79,7 @@ public class DefaultView extends AbstractGameView {
      */
     private boolean isResettingGUI;
 
-    private IViewState viewState;
+    private AbstractViewState viewState;
 
     private AbstractGameModel updateDelegate;
 
@@ -159,7 +159,7 @@ public class DefaultView extends AbstractGameView {
     }
 
     @Override
-    public IViewState getViewState() {
+    public AbstractViewState getViewState() {
 	return viewState;
     }
 
@@ -167,7 +167,7 @@ public class DefaultView extends AbstractGameView {
     public void setViewState(String stateName) {
 	String name = "yang.leon.quoridor.state." + stateName;
 	try {
-	    this.viewState = (IViewState) Class.forName(name)
+	    this.viewState = (AbstractViewState) Class.forName(name)
 		    .getConstructor(AbstractGameView.class).newInstance(this);
 	} catch (Exception e) {
 	    e.printStackTrace();

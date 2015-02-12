@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 import javax.swing.JPanel;
 
-import yang.leon.quoridor.state.IViewState;
+import yang.leon.quoridor.state.AbstractViewState;
 
 /**
  * A view that displays the game states and interact with the user. Inputs are
@@ -126,18 +126,18 @@ public abstract class AbstractGameView extends JPanel implements Serializable {
     public abstract void setModelAdapter(IModelAdapter modelAdpt);
 
     /**
-     * Gets the current {@link IViewState IViewState} of this game view.
+     * Gets the current {@link AbstractViewState AbstractViewState} of this game view.
      * 
-     * @return the current <code>IViewState</code>
+     * @return the current <code>AbstractViewState</code>
      */
-    public abstract IViewState getViewState();
+    public abstract AbstractViewState getViewState();
 
     /**
-     * Sets the view state of this game view to be a {@link IViewState
-     * IViewState} constructed dynamically with the name given.
+     * Sets the view state of this game view to be a {@link AbstractViewState
+     * AbstractViewState} constructed dynamically with the name given.
      * 
      * @param stateName
-     *            the class name of a specific <code>IViewState</code> to be
+     *            the class name of a specific <code>AbstractViewState</code> to be
      *            constructed and set
      */
     public abstract void setViewState(String stateName);

@@ -29,6 +29,13 @@ public abstract class AbstractGameModel implements Serializable {
     public static final int HORIZONTAL_WALL = 1, VERTICAL_WALL = 2;
 
     /**
+     * The states constants that indicates which edge a pawn is on. It is used
+     * for checking whether the game has ended.
+     */
+    public static final int NOT_ON_EDGE = -1, NORTH_EDGE = 0, EAST_EDGE = 1,
+	    SOUTH_EDGE = 2, WEST_EDGE = 3;
+
+    /**
      * Gets the {@link IViewAdapter IViewAdapter} of this model, which provides
      * methods to control the game view indirectly.
      * 

@@ -21,7 +21,7 @@ public interface IViewAdapter {
      * setViewState} method if it is not null.
      * 
      * @param stateName
-     *            the class name of a specific <code>IViewState</code> to be
+     *            the class name of a specific <code>AbstractViewState</code> to be
      *            constructed and set
      */
     public void setViewState(String stateName);

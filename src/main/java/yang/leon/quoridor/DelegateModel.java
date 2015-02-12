@@ -3,6 +3,16 @@ package yang.leon.quoridor;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+/**
+ * An empty implementation of <code>AbstractGameModel</code>. It is used when
+ * only one or some of the methods are needed, so that calling unnecessary
+ * methods will not incur unexpected results. One example is the update delegate
+ * which only stores the information necessary for updating the game view.
+ * 
+ * @author Leon Yang
+ * @see AbstractGameModel#getUpdateDelegate() getUpdateDelegate
+ * @see AbstractGameModel#setUpdateDelegate() setUpdateDelegate
+ */
 class DelegateModel extends AbstractGameModel {
 
     /**
@@ -67,7 +77,7 @@ class DelegateModel extends AbstractGameModel {
     }
 
     @Override
-    public void setUpdateDelegate(AbstractGameModel updateDelegate) {	
+    public void setUpdateDelegate(AbstractGameModel updateDelegate) {
     }
 
 }

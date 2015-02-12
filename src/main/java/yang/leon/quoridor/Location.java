@@ -2,6 +2,14 @@ package yang.leon.quoridor;
 
 import java.io.Serializable;
 
+/**
+ * A 2-tuple used to index the squares and crossing of a chess grid. Even though
+ * both squares and crossing use the same indexing method, their
+ * <code>Location</code>s are not exchangeable.
+ * 
+ * @author Leon Yang
+ *
+ */
 public class Location implements Serializable {
 
     /**

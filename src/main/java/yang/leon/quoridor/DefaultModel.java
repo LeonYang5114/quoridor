@@ -18,13 +18,6 @@ public class DefaultModel extends AbstractGameModel {
     public static final int WIDTH = 9, HEIGHT = 9;
 
     /**
-     * The states constants that indicates which edge a pawn is on. It is used
-     * for checking whether the game has ended.
-     */
-    public static final int NOT_ON_EDGE = -1, NORTH_EDGE = 0, EAST_EDGE = 1,
-	    SOUTH_EDGE = 2, WEST_EDGE = 3;
-
-    /**
      * Number of walls a player has.
      */
     public static final int TOTAL_WALLS = 20;
@@ -328,7 +321,8 @@ public class DefaultModel extends AbstractGameModel {
 
     /**
      * Creates an update delegate. It is an <code>AbstractGameModel</code>
-     * containing only the necessary information for updating the game view.
+     * containing only the necessary information for updating the game view. It
+     * is called when the game state changes and the game view needs update.
      * 
      * @return the update delegate created
      */

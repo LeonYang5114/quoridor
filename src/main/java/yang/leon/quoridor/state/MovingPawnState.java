@@ -3,7 +3,6 @@ package yang.leon.quoridor.state;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
@@ -13,18 +12,48 @@ import yang.leon.quoridor.DefaultView;
 import yang.leon.quoridor.IModelAdapter;
 import yang.leon.quoridor.Location;
 
-public class MovingPawnState extends IViewState {
+/**
+ * Represents the state of the game view when the player is moving his pawn. All
+ * the valid moves are shown and if any of them is left clicked, a move is made
+ * and the current player's turn ends.
+ * 
+ * @author Leon Yang
+ *
+ */
+public class MovingPawnState extends AbstractViewState {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1277736410447138262L;
 
+    /**
+     * A list of <code>Location</code>s that the current player's pawn can move
+     * to
+     */
+    private ArrayList<Location> canMoveLocs;
+
+    /**
+     * Constructs this view state with the given context.
+     * 
+     * @param context
+     *            the game view context of this view state
+     */
     public MovingPawnState(AbstractGameView context) {
 	super(context);
+	IModelAdapter adpt = getContext().getModelAdapter();
+	canMoveLocs = adpt.getCanMoveLocs(adpt.getPlayer(
+		adpt.getCurrPlayerIndex()).getPawnLoc());
 	getContext().update();
     }
 
+    /**
+     * If the right mouse button is clicked, the state of the context changes to
+     * {@link InitialState}. If the left mouse button is clicked and the
+     * location of the mouse indicates a valid location to move the pawn, a move
+     * is made and the current player ends his turn. If the current player
+     * reaches this target edge after this move, he wins.
+     */
     @Override
     public void mousePressed(MouseEvent e) {
 	if (SwingUtilities.isRightMouseButton(e)) {
@@ -36,10 +65,7 @@ public class MovingPawnState extends IViewState {
 	    return;
 	Location loc = DefaultView.getSqrLocAtPoint(e.getPoint());
 	IModelAdapter adpt = getContext().getModelAdapter();
-	ArrayList<Location> canMoveLocs = null;
-	canMoveLocs = adpt.getCanMoveLocs(adpt.getPlayer(
-		adpt.getCurrPlayerIndex()).getPawnLoc());
-	if (canMoveLocs == null || !canMoveLocs.contains(loc))
+	if (!canMoveLocs.contains(loc))
 	    return;
 	if (adpt.movePawn(loc)) {
 	    getContext().win(adpt.getCurrPlayerIndex());
@@ -48,17 +74,18 @@ public class MovingPawnState extends IViewState {
 	adpt.nextPlayer();
     }
 
+    /**
+     * Does nothing.
+     */
     @Override
     public void mouseMoved(MouseEvent e) {
     }
 
+    /**
+     * Draws the valid locations to move the current player's pawn.
+     */
     @Override
     public void update(Graphics g) {
-	IModelAdapter adpt = getContext().getModelAdapter();
-	Location pawnLoc = null;
-	pawnLoc = adpt.getPlayer(adpt.getCurrPlayerIndex()).getPawnLoc();
-	ArrayList<Location> canMoveLocs = null;
-	canMoveLocs = adpt.getCanMoveLocs(pawnLoc);
 	for (Location loc : canMoveLocs) {
 	    Point p = DefaultView.getPointFromSqrLoc(loc);
 	    g.drawImage(getContext().getImage("pawn.light"), p.x, p.y, null);
