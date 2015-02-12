@@ -19,7 +19,6 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -35,17 +34,51 @@ import yang.leon.quoridor.IRemoteModelAdapter;
 import yang.leon.quoridor.IRemoteViewAdapter;
 import yang.leon.quoridor.RemoteController;
 
+/**
+ * A mode wizard which represents a client in a network game and helps search
+ * for the server (host).
+ * 
+ * @author Leon Yang
+ *
+ */
 public class ClientGameWizard extends AbstractModeWizard {
 
-    private AbstractModeController controller;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2028879025627140646L;
 
+    /**
+     * Input area for the host address. If it is blank, it looks for server in
+     * the local computer.
+     */
     private JTextField tf_hostAddress;
+
+    /**
+     * Input are for the host name, which is used to identify the server in the
+     * RMI calls.
+     */
     private JTextField tf_hostName;
+
+    /**
+     * Displays any log related to the connection.
+     */
     private JTextArea ta_clientLog;
 
+    /**
+     * Button that lists all the local servers on clicked.
+     */
     private JButton btn_list;
+
+    /**
+     * Button that tries to connect the client to the specific server on
+     * clicked.
+     */
     private JButton btn_connect;
 
+    /**
+     * Constructs the client game wizard and initializes its GUI.
+     */
     public ClientGameWizard() {
 	super();
 	System.out.println("client game wizard");
@@ -184,6 +217,13 @@ public class ClientGameWizard extends AbstractModeWizard {
 
     }
 
+    /**
+     * Finds the servers in the local network using UDP broadcast and returns a
+     * list of <code>String</code>s that contain the servers' address and name.
+     * 
+     * @return a list of <code>String</code>s that contain the servers' address
+     *         and name
+     */
     private ArrayList<DatagramPacket> findServers() {
 	DatagramSocket c;
 	// This segment of code comes from Michiel De Mey
@@ -292,14 +332,12 @@ public class ClientGameWizard extends AbstractModeWizard {
 	return null;
     }
 
-    public void setModeController(AbstractModeController controller) {
-	this.controller = controller;
-    }
-
-    public AbstractModeController getModeController() {
-	return controller;
-    }
-
+    /**
+     * Shows message on the log text area if this client is connected to a
+     * server.
+     * 
+     * @param serverName the name of the server this client connected to
+     */
     public void serverConnected(String serverName) {
 	ta_clientLog.append("Server: " + serverName + " connected.\n");
     }

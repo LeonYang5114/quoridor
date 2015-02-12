@@ -19,12 +19,27 @@ import yang.leon.quoridor.DefaultController;
 import yang.leon.quoridor.DefaultModel;
 import yang.leon.quoridor.DefaultView;
 
+/**
+ * The mode wizard which help launch a local game.
+ * 
+ * @author Leon Yang
+ *
+ */
 public class LocalGameWizard extends AbstractModeWizard {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 886701926858480914L;
+
+    /**
+     * Takes input of number of players in the game.
+     */
     private JComboBox<Integer> cb_numPlayers;
 
-    private AbstractModeController controller;
-
+    /**
+     * Constructs the local game wizard and initializes its GUI.
+     */
     public LocalGameWizard() {
 	super();
 	setLayout(new GridBagLayout());
@@ -84,13 +99,6 @@ public class LocalGameWizard extends AbstractModeWizard {
 	c.gridwidth = 1;
 
 	setBorder(BorderFactory.createTitledBorder("Local Game"));
-    }
-    public void setModeController(AbstractModeController controller) {
-	this.controller = controller;
-    }
-    
-    public AbstractModeController getModeController() {
-	return controller;
     }
 
 }

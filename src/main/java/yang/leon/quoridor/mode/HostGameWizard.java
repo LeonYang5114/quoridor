@@ -28,18 +28,50 @@ import yang.leon.quoridor.DefaultView;
 import yang.leon.quoridor.IRemoteModelAdapter;
 import yang.leon.quoridor.RemoteController;
 
+/**
+ * A mode wizard that helps host a network game, listens to client connections,
+ * and launches the game.
+ * 
+ * @author Leon Yang
+ *
+ */
 public class HostGameWizard extends AbstractModeWizard {
 
-    private AbstractModeController controller;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 207327648817422356L;
 
+    /**
+     * Input area for the name of the host, which is used for identification.
+     */
     private JTextField tf_hostName;
+
+    /**
+     * Displays any log related to the connection.
+     */
     private JTextArea ta_hostLog;
 
+    /**
+     * Button that starts the host to listen to client requests on clicked.
+     */
     private JButton btn_listen;
+
+    /**
+     * Button that launches the game on clicked. This button is only enabled
+     * when at least one client has connected to the host.
+     */
     private JButton btn_launch;
 
+    /**
+     * The game server which provides the game model and connects to all other
+     * client remote controllers.
+     */
     private RemoteController serverController;
 
+    /**
+     * Constructs the host game wizard and initializes its GUI.
+     */
     public HostGameWizard() {
 	super();
 	System.out.println("host game wizard");
@@ -148,6 +180,13 @@ public class HostGameWizard extends AbstractModeWizard {
 
     }
 
+    /**
+     * Listens to any UDP client request and send back a message containing the
+     * name and address of this server so that the client can know about and
+     * connect to this and all other server on the local network.
+     * 
+     * @param serverName
+     */
     private void listenForUDP(final String serverName) {
 	Thread listen = new Thread() {
 	    // This segment of code comes from Michiel De Mey
@@ -198,14 +237,13 @@ public class HostGameWizard extends AbstractModeWizard {
 	listen.start();
     }
 
-    public void setModeController(AbstractModeController controller) {
-	this.controller = controller;
-    }
-
-    public AbstractModeController getModeController() {
-	return controller;
-    }
-
+    /**
+     * Shows message on the log text area if a client is connected to this
+     * server.
+     * 
+     * @param clientName
+     *            the name of the client connected to this server
+     */
     public void clientAdded(String clientName) {
 	ta_hostLog.append("Client: " + clientName + " connected.\n");
 	btn_launch.setEnabled(true);
