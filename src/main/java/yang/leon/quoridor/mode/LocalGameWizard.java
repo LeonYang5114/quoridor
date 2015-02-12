@@ -59,6 +59,7 @@ public class LocalGameWizard extends AbstractModeWizard {
 		AbstractGameController controller = new DefaultController(
 			new DefaultModel(numPlayers));
 		final AbstractGameView view = new DefaultView(controller);
+		view.setViewState("InitialState");
 		
 		AbstractLauncher launcher = new AbstractLauncher() {
 		    @Override
