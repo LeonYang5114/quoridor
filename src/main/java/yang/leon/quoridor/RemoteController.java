@@ -10,7 +10,6 @@ import java.util.Collections;
 import javax.swing.JFrame;
 
 import yang.leon.quoridor.mode.AbstractLauncher;
-import yang.leon.quoridor.state.InitialState;
 
 public class RemoteController extends DefaultController implements
 	IRemoteViewAdapter, IRemoteModelAdapter {

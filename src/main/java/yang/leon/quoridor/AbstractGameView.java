@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 import javax.swing.JPanel;
 
-import yang.leon.quoridor.state.AbstractViewState;
+import yang.leon.quoridor.viewstate.AbstractViewState;
 
 /**
  * A view that displays the game states and interact with the user. Inputs are
@@ -210,7 +210,7 @@ public abstract class AbstractGameView extends JPanel implements Serializable {
      * Disables the game-related buttons related. This method should be called
      * when the player ends his turn in a network game.
      * 
-     * @see yang.leon.quoridor.state.WaitingState WaitingState
+     * @see yang.leon.quoridor.viewstate.WaitingState WaitingState
      */
     public abstract void disableButtons();
 
@@ -218,7 +218,7 @@ public abstract class AbstractGameView extends JPanel implements Serializable {
      * Enables the game-related buttons. This method should be called when the
      * player starts his turn in a network game.
      * 
-     * @see yang.leon.quoridor.state.WaitingState WaitingState
+     * @see yang.leon.quoridor.viewstate.WaitingState WaitingState
      */
     public abstract void enableButtons();
 }

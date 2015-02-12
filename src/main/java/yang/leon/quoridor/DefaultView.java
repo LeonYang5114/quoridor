@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,11 +23,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import yang.leon.quoridor.state.HoldingWallState;
-import yang.leon.quoridor.state.AbstractViewState;
-import yang.leon.quoridor.state.MovingPawnState;
-import yang.leon.quoridor.state.WaitingState;
-import yang.leon.quoridor.state.WonState;
+import yang.leon.quoridor.viewstate.AbstractViewState;
+import yang.leon.quoridor.viewstate.HoldingWallState;
+import yang.leon.quoridor.viewstate.MovingPawnState;
 
 public class DefaultView extends AbstractGameView {
 
@@ -51,7 +48,7 @@ public class DefaultView extends AbstractGameView {
     private JPanel pnl_func;
 
     /**
-     * Button to switch to the {@link yang.leon.quoridor.state.HoldingWallState
+     * Button to switch to the {@link yang.leon.quoridor.viewstate.HoldingWallState
      * HoldingWallState}.
      */
     private JButton btn_wall;
@@ -62,9 +59,9 @@ public class DefaultView extends AbstractGameView {
     private JLabel lb_numWalls;
 
     /**
-     * Button to switch to the {@link yang.leon.quoridor.state.MovingPawnState
+     * Button to switch to the {@link yang.leon.quoridor.viewstate.MovingPawnState
      * MovingPawnState}. Same effect as clicking the pawn of the current player
-     * at {@link yang.leon.quoridor.state.InitialState InitialState}.
+     * at {@link yang.leon.quoridor.viewstate.InitialState InitialState}.
      */
     private JButton btn_pawn;
 
@@ -165,7 +162,7 @@ public class DefaultView extends AbstractGameView {
 
     @Override
     public void setViewState(String stateName) {
-	String name = "yang.leon.quoridor.state." + stateName;
+	String name = "yang.leon.quoridor.viewstate." + stateName;
 	try {
 	    this.viewState = (AbstractViewState) Class.forName(name)
 		    .getConstructor(AbstractGameView.class).newInstance(this);
